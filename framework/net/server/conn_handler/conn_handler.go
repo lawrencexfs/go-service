@@ -18,8 +18,8 @@ import (
 */
 // ConnHandler 连接处理
 type ConnHandler struct {
-	msgProcSet  *msgprocset.MsgProcSet
-	sessEvtSink inet.ISessEvtSink
+	msgProcSet *msgprocset.MsgProcSet
+	//sessEvtSink inet.ISessEvtSink
 
 	sessVerifyMsgID inet.MsgID // 验证消息ID
 	isEncrypt       bool       //是否需要加密
@@ -39,7 +39,7 @@ func New() *ConnHandler {
 // HandleConn 处理连接.
 // 创建 Session, 并且开始会话协程。
 func (h *ConnHandler) HandleConn(conn net.Conn) {
-	sess := session.New(conn, h.isEncrypt, h.sessEvtSink, false)
+	sess := session.New(conn, h.isEncrypt /* h.sessEvtSink,*/, false)
 
 	// 在会话上注册所有处理函数
 	if h.msgProcSet != nil {
@@ -59,9 +59,11 @@ func (h *ConnHandler) HandleConn(conn net.Conn) {
 }
 
 // SetSessEvtSink 设置sess
-func (h *ConnHandler) SetSessEvtSink(sink inet.ISessEvtSink) {
+/*func (h *ConnHandler) SetSessEvtSink(sink inet.ISessEvtSink) {
+	panic("ConnHandler SetSessEvtSink...................")
 	h.sessEvtSink = sink
 }
+*/
 
 //SetEncrypt 设置是否加密，默认不加密
 func (h *ConnHandler) SetEncrypt(isEncrypt bool) {

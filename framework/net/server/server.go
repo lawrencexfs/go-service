@@ -26,8 +26,6 @@ func New(protocol string, addr string, maxConns int) (*Server, error) {
 		connHandler: connhandler.New(),
 	}
 
-	//srv.AddMsgProc(&baseproc.BaseProcServer{})
-
 	var err error
 	// 接受新连接时会 go sessMgr.HandleConn(), 运行 session.Start().
 	srv.listener, err = listener.NewListener(protocol, addr, maxConns)
@@ -52,9 +50,10 @@ func (s *Server) Close() {
 
 // SetSessEvtSink 设置一个会话事件接收器.
 // Depricated. 应该使用 MsgProc 的 OnClosed(), 更简单。
-func (s *Server) SetSessEvtSink(sink inet.ISessEvtSink) {
+/*func (s *Server) SetSessEvtSink(sink inet.ISessEvtSink) {
 	s.connHandler.SetSessEvtSink(sink)
 }
+*/
 
 // AddMsgProc 添加消息处理
 func (s *Server) AddMsgProc(msgProc msgprocset.IMsgProc) {

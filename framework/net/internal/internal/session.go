@@ -428,6 +428,7 @@ func (sess *Session) callonClosed() {
 			f()
 		}
 
+		//暂时保留，没啥用
 		sess.onClosed()
 	}
 }

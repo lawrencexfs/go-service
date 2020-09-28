@@ -5,7 +5,6 @@ import (
 
 	"github.com/giant-tech/go-service/framework/net/inet"
 	"github.com/giant-tech/go-service/framework/net/internal"
-
 	"go.uber.org/atomic"
 )
 
@@ -18,7 +17,7 @@ type Session struct {
 	userData atomic.Value
 
 	// 会话事件接收器
-	evtSink inet.ISessEvtSink
+	//evtSink inet.ISessEvtSink
 }
 
 // _IInternalSession 代表一个客户端服务器通用会话.
@@ -61,25 +60,29 @@ type Session struct {
 }*/
 
 // New 新建
-func New(conn net.Conn, encryEnabled bool, sessEvtSink inet.ISessEvtSink, isIdip bool) *Session {
+func New(conn net.Conn, encryEnabled bool /*sessEvtSink inet.ISessEvtSink,*/, isIdip bool) *Session {
 	result := &Session{
 		ISession: internal.NewSession(conn, encryEnabled, false, isIdip),
-		evtSink:  sessEvtSink,
+		//evtSink:  sessEvtSink,
 	}
 	result.SetOnClosed(result.onClosed)
 
+	/*log.Debug("sessEvtSink=", sessEvtSink)
+
 	if sessEvtSink != nil {
+		panic("New sessEvtSink=")
 		sessEvtSink.OnConnected(result)
-	}
+	}*/
 	return result
 }
 
-// onClosed session关闭回调
+// onClosed session关闭回调, 暂时保留，调用不到这里
 func (s *Session) onClosed() {
-	if s.evtSink == nil {
+
+	/*if s.evtSink == nil {
 		return
 	}
-	s.evtSink.OnClosed(s)
+	s.evtSink.OnClosed(s)*/
 }
 
 // GetUserData 获得用户数据

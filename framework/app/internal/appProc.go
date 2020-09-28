@@ -39,8 +39,7 @@ func (p *ProcApp) RegisterMsgProcFunctions(sess inet.ISession) interface{} {
 // OnClosed app关闭回调
 func (p *ProcApp) OnClosed() {
 	// 会话断开时动作...
-	seelog.Infof("OnClosed sessID:%d, remote addr:%s", p.Sess.GetID(), p.Sess.RemoteAddr())
-
+	seelog.Infof("OnClosed sessID:%d, remote app addr:%s", p.Sess.GetID(), p.Sess.RemoteAddr())
 	//通知app，远程服务不可用了
 	service.GetServiceProxyMgr().OnServiceClosed(p.remoteAppID)
 
