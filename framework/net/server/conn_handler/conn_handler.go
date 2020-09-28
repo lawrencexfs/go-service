@@ -5,8 +5,8 @@ import (
 
 	"github.com/giant-tech/go-service/framework/msgdef"
 	"github.com/giant-tech/go-service/framework/net/inet"
-	msgprocset "github.com/giant-tech/go-service/framework/net/server/internal/msg_proc_set"
-	"github.com/giant-tech/go-service/framework/net/server/internal/session"
+	msgprocset "github.com/giant-tech/go-service/framework/net/server/msg_proc_set"
+	"github.com/giant-tech/go-service/framework/net/server/session"
 
 	"golang.org/x/time/rate"
 )

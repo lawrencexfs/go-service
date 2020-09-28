@@ -3,17 +3,16 @@ package session
 import (
 	"net"
 
-	"github.com/giant-tech/go-service/base/imsg"
 	"github.com/giant-tech/go-service/framework/net/inet"
 	"github.com/giant-tech/go-service/framework/net/internal"
 
 	"go.uber.org/atomic"
-	"golang.org/x/time/rate"
 )
 
 // Session 封装客户端服务器通用会话，并提供服务器专用功能。
 type Session struct {
-	_IInternalSession
+	//_IInternalSession
+	inet.ISession
 
 	// 可以保存任意用户数据
 	userData atomic.Value
@@ -23,7 +22,7 @@ type Session struct {
 }
 
 // _IInternalSession 代表一个客户端服务器通用会话.
-type _IInternalSession interface {
+/*type _IInternalSession interface {
 	RegMsgProcFunc(msgID inet.MsgID, procFunc func(imsg.IMsg))
 	RegMsgProc(interface{})
 
@@ -59,13 +58,13 @@ type _IInternalSession interface {
 
 	On(evt string, f func(interface{}))
 	Emit(evt string, p interface{})
-}
+}*/
 
 // New 新建
 func New(conn net.Conn, encryEnabled bool, sessEvtSink inet.ISessEvtSink, isIdip bool) *Session {
 	result := &Session{
-		_IInternalSession: internal.NewSession(conn, encryEnabled, false, isIdip),
-		evtSink:           sessEvtSink,
+		ISession: internal.NewSession(conn, encryEnabled, false, isIdip),
+		evtSink:  sessEvtSink,
 	}
 	result.SetOnClosed(result.onClosed)
 

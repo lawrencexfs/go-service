@@ -2,9 +2,9 @@ package server
 
 import (
 	"github.com/giant-tech/go-service/framework/net/inet"
-	connhandler "github.com/giant-tech/go-service/framework/net/server/internal/conn_handler"
-	"github.com/giant-tech/go-service/framework/net/server/internal/listener"
-	msgprocset "github.com/giant-tech/go-service/framework/net/server/internal/msg_proc_set"
+	connhandler "github.com/giant-tech/go-service/framework/net/server/conn_handler"
+	"github.com/giant-tech/go-service/framework/net/server/listener"
+	msgprocset "github.com/giant-tech/go-service/framework/net/server/msg_proc_set"
 
 	"golang.org/x/time/rate"
 )
