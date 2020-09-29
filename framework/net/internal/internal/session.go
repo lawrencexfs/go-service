@@ -502,7 +502,7 @@ func (sess *Session) readAndHandleOneMsg() error {
 			sess.verifyMsgID, msgID)
 
 	}
-	// 重置心跳計時器
+	// 重置心跳计时器
 	sess.ResetHb()
 	sess.msgHdlr.HandleRawMsg(msgID, rawMsgBuf)
 
