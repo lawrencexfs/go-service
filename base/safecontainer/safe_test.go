@@ -1,9 +1,9 @@
 package safecontainer
 
 import (
-	"fmt"
-	"github.com/magiconair/properties/assert"
 	"testing"
+
+	"github.com/magiconair/properties/assert"
 )
 
 type msgFireInfo struct {
@@ -24,35 +24,38 @@ func Test_list(t *testing.T) {
 		content: &T{index: 1},
 	})
 
-	fmt.Println(sl.IsEmpty())
+	if sl.IsEmpty() {
+		t.Error("sl is empty")
+	}
 
 	sl.Pop()
 
-	fmt.Println(sl.IsEmpty())
+	if !sl.IsEmpty() {
+		t.Error("sl is not empty")
+	}
 
 }
-
 
 func Test_mulist(t *testing.T) {
 
 	sl := NewSafeList_M()
-	assert.Equal(t,sl.IsEmpty(),true,"must empty")
+	assert.Equal(t, sl.IsEmpty(), true, "must empty")
 	sl.Put(1)
-	assert.Equal(t,sl.IsEmpty(),false,"must not empty")
+	assert.Equal(t, sl.IsEmpty(), false, "must not empty")
 	sl.Put(2)
 	sl.Put(3)
 
-	v1,err1:= sl.Pop()
-	assert.Equal(t,v1,1,"pop1 error")
-	assert.Equal(t,err1,nil,"pop1 error")
+	v1, err1 := sl.Pop()
+	assert.Equal(t, v1, 1, "pop1 error")
+	assert.Equal(t, err1, nil, "pop1 error")
 
-	v2,err2:= sl.Pop()
-	assert.Equal(t,v2,2,"pop2 error")
-	assert.Equal(t,err2,nil,"pop2 error")
+	v2, err2 := sl.Pop()
+	assert.Equal(t, v2, 2, "pop2 error")
+	assert.Equal(t, err2, nil, "pop2 error")
 
-	v3,err3:= sl.Pop()
-	assert.Equal(t,v3,3,"pop3 error")
-	assert.Equal(t,err3,nil,"pop3 error")
+	v3, err3 := sl.Pop()
+	assert.Equal(t, v3, 3, "pop3 error")
+	assert.Equal(t, err3, nil, "pop3 error")
 
 }
 
@@ -76,7 +79,6 @@ func BenchmarkList(b *testing.B) {
 
 }
 
-
 //mutex list
 func BenchmarkMuList(b *testing.B) {
 	sl := NewSafeList_M()
@@ -95,7 +97,6 @@ func BenchmarkMuList(b *testing.B) {
 	})
 
 }
-
 
 //chan
 func BenchmarkChan(b *testing.B) {

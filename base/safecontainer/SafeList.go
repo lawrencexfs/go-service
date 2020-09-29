@@ -25,7 +25,8 @@ type SafeList struct {
 	head unsafe.Pointer
 	tail unsafe.Pointer
 
-	C chan bool
+	// 有数据就用channel通知
+	HasDataC chan bool
 }
 
 // NewSafeList 新创建一个列表
@@ -51,7 +52,7 @@ func (sl *SafeList) Put(data interface{}) {
 		if next != nil {
 			atomic.CompareAndSwapPointer(&sl.tail, tail, next)
 		} else {
-			if atomic.CompareAndSwapPointer(&(*SafeListNode)(sl.tail).next, nil, newNode) {
+			if atomic.CompareAndSwapPointer(&(*SafeListNode)(atomic.LoadPointer(&sl.tail)).next, nil, newNode) {
 				break
 			}
 		}
@@ -60,8 +61,8 @@ func (sl *SafeList) Put(data interface{}) {
 
 	atomic.CompareAndSwapPointer(&sl.tail, tail, newNode)
 
-	if len(sl.C) == 0 {
-		sl.C <- true
+	if len(sl.HasDataC) == 0 {
+		sl.HasDataC <- true // XXX 此处有可能多个同时调用造成阻塞，可加大缓冲
 	}
 }
 
