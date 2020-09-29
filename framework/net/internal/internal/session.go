@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/giant-tech/go-service/base/imsg"
-	"github.com/giant-tech/go-service/base/sflist"
+	"github.com/giant-tech/go-service/base/safecontainer"
 	"github.com/giant-tech/go-service/framework/msgdef"
 	"github.com/giant-tech/go-service/framework/net/inet"
 	"github.com/giant-tech/go-service/framework/net/internal/internal/msgenc"
@@ -32,7 +32,7 @@ func NewSession(conn net.Conn, encryEnabled bool, isClient bool, isIdip bool) *S
 		id: sessionIDGen.Inc(),
 
 		conn:    conn,
-		sendBuf: sflist.NewSafeList(),
+		sendBuf: safecontainer.NewSafeList(),
 
 		hbTimerInterval: time.Duration(viper.GetInt("Config.HBTimer")) * time.Second,
 		hbEnabled:       viper.GetBool("Config.HeartBeat"),
@@ -62,9 +62,9 @@ func NewSession(conn net.Conn, encryEnabled bool, isClient bool, isIdip bool) *S
 
 // Session 代表一个网络连接
 type Session struct {
-	id      uint64           //唯一id
-	conn    net.Conn         // 底层连接对象
-	sendBuf *sflist.SafeList // 缓存待发送的数据
+	id      uint64                  //唯一id
+	conn    net.Conn                // 底层连接对象
+	sendBuf *safecontainer.SafeList // 缓存待发送的数据
 
 	ctx       context.Context
 	ctxCancel context.CancelFunc
