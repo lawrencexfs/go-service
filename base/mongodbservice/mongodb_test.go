@@ -1,9 +1,6 @@
 package dbservice
 
 import (
-
-	//这里要改成mongodb.go的文件存放路径
-
 	"fmt"
 	"log"
 	"testing"
