@@ -11,6 +11,7 @@ require (
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
 	github.com/gogo/protobuf v1.2.1
 	github.com/golang/snappy v0.0.1
+	github.com/jinzhu/gorm v1.9.16
 	github.com/klauspost/cpuid v1.2.1 // indirect
 	github.com/klauspost/reedsolomon v1.9.2 // indirect
 	github.com/prometheus/common v0.4.0
@@ -23,7 +24,7 @@ require (
 	github.com/xtaci/kcp-go v5.4.2+incompatible
 	go.uber.org/atomic v1.4.0
 	golang.org/x/lint v0.0.0-20190409202823-959b441ac422 // indirect
-	golang.org/x/net v0.0.0-20190620200207-3b0461eec859
+	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4
 	google.golang.org/grpc v1.21.0
 )
