@@ -134,9 +134,9 @@ func (t *TypeTemplate) genMap(name string, valMap map[string]interface{}) string
 		tval := typMap["type"].(string)
 
 		if name == "index" {
-			baseStr += fmt.Sprintf("%s]", tval)
-		} else if name == "value" {
 			baseStr += fmt.Sprintf("%s\n", tval)
+		} else if name == "value" {
+			baseStr += fmt.Sprintf("%s]", tval)
 		}
 	}
 

@@ -52,7 +52,7 @@ func (e *Entity) addProp(prop *PropDef) {
 	e.props[prop.Name] = newPropInfo(prop)
 }
 
-// SetProp 设置一个属性的值
+// SetProp 设置一个属性的值 上层开发者调用
 func (e *Entity) SetProp(name string, v interface{}) {
 
 	p := e.props[name]

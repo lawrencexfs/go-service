@@ -1,3 +1,3 @@
-# 使用说明
+# 浣跨敤璇存槑
 
-当前目录执行 go build, 会生成propGen.exe
+褰撳墠鐩綍鎵ц go build, 浼氱敓鎴恜ropGen.exe
