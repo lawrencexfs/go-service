@@ -1,4 +1,4 @@
-package orm
+package gorm
 
 //DBQuery db查询
 /*func DBQuery(db string, collection string, queryCondition interface{}, retval interface{}) error {

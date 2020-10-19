@@ -1,4 +1,4 @@
-package orm
+package gorm
 
 import (
 	log "github.com/cihub/seelog"
