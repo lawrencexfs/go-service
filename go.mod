@@ -9,9 +9,11 @@ require (
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/garyburd/redigo v1.6.0
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
+	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gogo/protobuf v1.2.1
 	github.com/golang/snappy v0.0.1
 	github.com/jinzhu/gorm v1.9.16
+	github.com/jmoiron/sqlx v1.2.0
 	github.com/klauspost/cpuid v1.2.1 // indirect
 	github.com/klauspost/reedsolomon v1.9.2 // indirect
 	github.com/prometheus/common v0.4.0

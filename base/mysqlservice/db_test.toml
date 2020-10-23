@@ -1,0 +1,15 @@
+[MysqlDB]
+# 数据库类型
+dbtype = "mysql"
+# 数据库地址
+#Addr = "dev:dev123@tcp(10.23.118.52:3306)/test_db?charset=utf8mb4"
+Addr = "root:123456@tcp(10.23.25.22:3306)/test_db?charset=utf8&parseTime=True&loc=Local"
+
+# 连接数据库超时时间
+Timeout = 5
+# 数据库连接空闲最大时间(单位小时)
+MaxIdleTime = 1
+# 数据库连接
+MaxIdleConn = 20
+MaxOpenConn = 200
+
