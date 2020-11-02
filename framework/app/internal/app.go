@@ -189,7 +189,9 @@ func (srv *App) Run(configFile string) {
 	}
 
 	setConfig(configFile)
-
+	// 设置Seelog
+	zlog.InitDefault()
+	defer seelog.Flush()
 	//根据dbtype 初始化db
 	DBType := viper.GetString("DataDB.DBType")
 
@@ -202,10 +204,6 @@ func (srv *App) Run(configFile string) {
 	if err != nil {
 		seelog.Error("InitDB failed, err=", err)
 	}
-
-	// 设置Seelog
-	zlog.InitDefault()
-	defer seelog.Flush()
 
 	//start prof
 	startProfServer()

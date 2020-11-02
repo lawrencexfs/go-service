@@ -24,14 +24,14 @@ func setConfig(configPath string) {
 // InitDB 初始化db
 func InitDB(configPath string) (err error) {
 	if configPath == "" {
-		log.Info("InitDB, configPath is nil, using default config")
+		log.Info("InitDB, configPath is nil, read db_test.toml config just for test")
 		configPath = "./db_test.toml"
 	}
 
 	setConfig(configPath)
-	dbtype := viper.GetString("MysqlDB.dbtype")
-	addr := viper.GetString("MysqlDB.Addr")
-	timeout := viper.GetInt64("MysqlDB.Timeout")
+	dbtype := viper.GetString("DataDB.dbtype")
+	addr := viper.GetString("DataDB.Addr")
+	timeout := viper.GetInt64("DataDB.Timeout")
 	if timeout == 0 {
 		timeout = 1
 	}
@@ -45,14 +45,14 @@ func InitDB(configPath string) (err error) {
 		log.Error("connect failed,", err)
 		return err
 	}
-	log.Info("connect DB success, addr = ", addr)
+	log.Info("connect mysql DB success, addr = ", addr)
 
-	maxIdleConn := viper.GetInt("MysqlDB.MaxIdleConn")
+	maxIdleConn := viper.GetInt("DataDB.MaxIdleConn")
 	log.Info("MaxIdleConn:", maxIdleConn)
 	if maxIdleConn > 0 {
 		mysqlDB.SetMaxIdleConns(maxIdleConn)
 	}
-	maxOpenConn := viper.GetInt("MysqlDB.MaxOpenConn")
+	maxOpenConn := viper.GetInt("DataDB.MaxOpenConn")
 	log.Info("maxOpenConn:", maxOpenConn)
 	if maxOpenConn > 0 {
 		mysqlDB.SetMaxOpenConns(maxOpenConn)
@@ -77,6 +77,6 @@ func GetMysqlDB() *sqlx.DB {
 		log.Error("getMysqlDB failed,", errNew)
 		return nil
 	}
-	log.Info("get db success")
+	log.Info("get mysql db success")
 	return mysqlDB
 }

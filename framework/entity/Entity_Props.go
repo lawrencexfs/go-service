@@ -36,6 +36,8 @@ func (e *Entity) InitProp(def *Def, loadFromDB bool) {
 	PropDBName = viper.GetString("DataDB.GameDBName")
 	PropTableName = viper.GetString("DataDB.GameTableName")
 
+	log.Debug("InitProp dbtype =", DBType, ", PropDBName=", PropDBName, ", PropTableName=", PropTableName)
+	//panic("begin load from db, dbtype=")
 	if loadFromDB {
 		if DBType == "mysql" {
 			e.loadFromMysqlDB()

@@ -104,10 +104,12 @@ func (e *Entity) savePropsToMongoDB() {
 // loadFromMysqlDB 从mysql加载数据
 func (e *Entity) loadFromMysqlDB() {
 
+	log.Debug("loadFromMysqlDB1.....")
 	if e.GetEntityID() == 0 {
 		return
 	}
 
+	log.Debug("loadFromMysqlDB2.....")
 	/*	rows, err := mysqlDB.Queryx("select * from team ")
 
 		for rows.Next() {
@@ -134,17 +136,21 @@ func (e *Entity) loadFromMysqlDB() {
 			props_str = props_str + k
 		}
 	}
-	db := mysqlservice.GetMysqlDB()
-	db.Queryx("select $1 from $2 where dbid=$3", props_str, PropTableName, e.GetEntityID())
 
-	//var val_struct
-	/*for rows.Next() {
-		err := rows.StructScan(&val_struct)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		fmt.Printf("%#v\n", place)
-	}*/
+	log.Debug("loadFromMysqlDB3.....")
+	db := mysqlservice.GetMysqlDB()
+	if db != nil {
+		db.Queryx("select $1 from $2 where dbid=$3", props_str, PropTableName, e.GetEntityID())
+
+		//var val_struct
+		/*for rows.Next() {
+			err := rows.StructScan(&val_struct)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			fmt.Printf("%#v\n", place)
+		}*/
+	}
 
 }
 
@@ -179,15 +185,16 @@ func (e *Entity) SavePropsToDB() {
 
 	//判断用哪个db存
 	if DBType == "mysql" {
-		e.savePropsToMongoDB()
-	} else if DBType == "mongodb" {
 		e.savePropsToMysqlDB()
+	} else if DBType == "mongodb" {
+		e.savePropsToMongoDB()
 	}
 }
 
 // LoadFromDB 从db中加载属性
 func (e *Entity) LoadFromDB() {
 
+	panic("load from db")
 	//判断用哪个db
 	if DBType == "mysql" {
 		e.loadFromMysqlDB()

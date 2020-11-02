@@ -21,7 +21,7 @@ func MongoDBQueryAll(db string, collection string, queryCondition interface{}, r
 			return err
 		}
 	} else {
-		log.Debug("session nil, not connect or auth")
+		log.Debug("session nil, not connect mongodb or auth")
 	}
 	return nil
 }
@@ -41,7 +41,7 @@ func MongoDBQueryOne(db string, collection string, queryCondition interface{}, r
 			return err
 		}
 	} else {
-		log.Error("session nil, not connect or auth")
+		log.Error("session nil, connect mongodb or auth")
 	}
 	return nil
 }
@@ -62,7 +62,7 @@ func MongoDBQuery(db string, collection string, queryCondition interface{}, retv
 			return err
 		}
 	} else {
-		log.Error("session nil, not connect or auth")
+		log.Error("session nil, not connect mongodb or auth")
 	}
 	return nil
 }
@@ -86,7 +86,7 @@ func MongoDBQueryOneWithSelect(db string, collection string, queryCondition inte
 		}
 
 	} else {
-		log.Error("session nil, not connect or auth")
+		log.Error("session nil, not connect mongodb or auth")
 	}
 	return nil
 }
@@ -104,7 +104,7 @@ func MongoDBInsert(db string, collection string, data interface{}) error {
 			return err
 		}
 	} else {
-		log.Error("session nil, not connect or auth")
+		log.Error("session nil, not connect mongodb or auth")
 	}
 	return nil
 }
@@ -123,7 +123,7 @@ func MongoDBUpdate(db string, collection string, updateCondition interface{}, da
 			return err
 		}
 	} else {
-		log.Error("session nil, not connect or auth")
+		log.Error("session nil, not connect mongodb or auth")
 	}
 	return nil
 
@@ -143,7 +143,7 @@ func MongoDBDelete(db string, collection string, removeCondition interface{}) er
 			return err
 		}
 	} else {
-		log.Error("session nil, not connect or auth")
+		log.Error("session nil, not connect mongodb or auth")
 	}
 	return nil
 }
@@ -161,7 +161,7 @@ func MongoDBEnsureIndex(db string, collection string, idx mgo.Index) error {
 			return err
 		}
 	} else {
-		log.Error("session nil, not connect or auth")
+		log.Error("session nil, not connect mongodb or auth")
 	}
 
 	return nil
@@ -181,7 +181,7 @@ func MongoDBListIndexs(db string, collection string, outIndexes *[]mgo.Index) er
 		}
 		*outIndexes = idxes
 	} else {
-		log.Error("session nil, not connect or auth")
+		log.Error("session nil, not connect mongodb or auth")
 	}
 	return nil
 }
@@ -244,7 +244,7 @@ func MongoDBFindAndModify(db string, collection string, updateCondition interfac
 			log.Error("findAndModify changed:", changedInfo)
 		}
 	} else {
-		log.Error("session nil, not connect or auth")
+		log.Error("session nil, not connect mongodb or auth")
 	}
 	return nil
 
