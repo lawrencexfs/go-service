@@ -12,7 +12,10 @@ import (
 	"syscall"
 	"time"
 
+	mongodbservice "github.com/giant-tech/go-service/base/mongodbservice"
+	mysqlservice "github.com/giant-tech/go-service/base/mysqlservice"
 	dbservice "github.com/giant-tech/go-service/base/redisservice"
+
 	"github.com/giant-tech/go-service/base/zlog"
 	"github.com/giant-tech/go-service/framework/idata"
 	"github.com/giant-tech/go-service/framework/iserver"
@@ -42,6 +45,8 @@ func setConfig(configPath string) {
 	viper.SetConfigFile(configPath)
 	if err := viper.ReadInConfig(); err != nil {
 		panic("加载配置文件失败: " + configPath + ", err: " + err.Error())
+	} else {
+		seelog.Debug("setConfig success, configPath= ", configPath)
 	}
 }
 
@@ -142,7 +147,6 @@ func (srv *App) init(names ...string) error {
 	if err != nil {
 		return err
 	}
-	//多设了一遍，可以删掉？	srv.AppNet.Server.SetVerifyMsgID(msgdef.ClientVerifyReqMsgID)
 
 	// 添加MsgProc, 这样新连接创建时会注册处理函数
 	srv.AppNet.Server.AddMsgProc(&ProcApp{})
@@ -185,6 +189,19 @@ func (srv *App) Run(configFile string) {
 	}
 
 	setConfig(configFile)
+
+	//根据dbtype 初始化db
+	DBType := viper.GetString("DataDB.DBType")
+
+	var err error
+	if DBType == "mysql" {
+		err = mysqlservice.InitDB(configFile)
+	} else if DBType == "mongodb" {
+		err = mongodbservice.InitDB(configFile)
+	}
+	if err != nil {
+		seelog.Error("InitDB failed, err=", err)
+	}
 
 	// 设置Seelog
 	zlog.InitDefault()

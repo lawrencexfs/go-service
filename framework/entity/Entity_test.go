@@ -38,3 +38,7 @@ func BenchmarkRangeMapTypeB(b *testing.B) {
 		}
 	}
 }
+
+func TestLoadFromMysql(t *testing.T) {
+
+}

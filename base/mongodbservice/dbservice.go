@@ -29,15 +29,16 @@ func setConfig(configPath string) {
 }
 
 //InitDB 初始化db
-func InitDB() bool {
+func InitDB(configPath string) (err error) {
 
-	var err error
 	var session *mgo.Session
 	if globalMgoSession == nil {
 
 		//测试时这两行再打开
-		//configPath := "../../../res/config/server.toml"
-		//setConfig(configPath)
+		if configPath == "" {
+			configPath := "../../../res/config/server.toml"
+			setConfig(configPath)
+		}
 		addr := viper.GetString("MongoDB.Addr")
 		timeout := viper.GetInt64("MongoDB.Timeout")
 		if timeout == 0 {
@@ -50,7 +51,7 @@ func InitDB() bool {
 
 		if err != nil {
 			log.Debug("connect failed,", err.Error())
-			return false
+			return err
 			//panic(err)
 		}
 		log.Info("connect MongoDB success, addr = ", addr)
@@ -60,16 +61,17 @@ func InitDB() bool {
 	globalMgoSession.SetMode(mgo.Monotonic, true)
 	//default is 4096
 	globalMgoSession.SetPoolLimit(300)
-	return true
+	return nil
 }
 
 //CloneSession 克隆一个session
 func CloneSession() *mgo.Session {
 	if globalMgoSession == nil {
-		rv := InitDB()
-		if !rv {
-			return nil
-		}
+		/*		rv := InitDB()
+				if !rv {
+					return nil
+				}*/
+		return nil
 	}
 	return globalMgoSession.Clone()
 }

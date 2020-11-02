@@ -30,12 +30,18 @@ func (e *Entity) InitProp(def *Def, loadFromDB bool) {
 		}
 	}
 
-	// 读取server.toml里的 mongodb配置
-	PropDBName = viper.GetString("MongoDB.GameDBName")
-	PropTableName = viper.GetString("MongoDB.GameTableName")
+	// 读取server.toml里的数据库配置
+
+	DBType = viper.GetString("DataDB.DBType")
+	PropDBName = viper.GetString("DataDB.GameDBName")
+	PropTableName = viper.GetString("DataDB.GameTableName")
 
 	if loadFromDB {
-		e.loadFromDB()
+		if DBType == "mysql" {
+			e.loadFromMysqlDB()
+		} else if DBType == "mongodb" {
+			e.loadFromMongoDB()
+		}
 	}
 }
 

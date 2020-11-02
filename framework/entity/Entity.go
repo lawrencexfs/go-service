@@ -286,6 +286,7 @@ func (e *Entity) OnEntityRegSrvID() {
 func (e *Entity) OnEntityDestroyed() {
 	if e.state == iserver.EntityStateLoop || e.state == iserver.EntityStateInit {
 		e.state = iserver.EntityStateDestroy
+
 		e.SavePropsToDB()
 		e.UnregSrvID()
 
@@ -293,7 +294,6 @@ func (e *Entity) OnEntityDestroyed() {
 		if ok {
 			ii.OnDestroy()
 		}
-
 	}
 }
 
