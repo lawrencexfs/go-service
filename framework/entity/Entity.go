@@ -294,6 +294,8 @@ func (e *Entity) OnEntityDestroyed() {
 		if ok {
 			ii.OnDestroy()
 		}
+	} else {
+		log.Info("state", e.state)
 	}
 }
 

@@ -30,7 +30,7 @@ type IReconnectHandler interface {
 	OnReconnect(sess inet.ISession) *ReconnectData
 }
 
-// ICloseHandler 登录处理
+// ICloseHandler 断开处理
 type ICloseHandler interface {
 	OnClose()
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// GatewayBase 大厅服务器
+// GatewayBase 网关基础
 type GatewayBase struct {
 	service.BaseService
 	ClientServer *server.Server
