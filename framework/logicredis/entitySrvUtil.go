@@ -15,7 +15,7 @@ type EntitySrvInfo struct {
 	GroupID uint64
 }
 
-// EntitySrvUtil entity服务器信息类
+// EntitySrvUtil 表工具类
 // 存储entity分布在哪些服务器上的信息
 // id为entityid
 type EntitySrvUtil struct {

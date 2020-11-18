@@ -193,20 +193,6 @@ func (srv *App) Run(configFile string) {
 	zlog.InitDefault()
 	defer seelog.Flush()
 	//根据dbtype 初始化db
-	DBType := viper.GetString("DataDB.DBType")
-
-	var err error
-	if DBType == "mysql" {
-		err = mysqlservice.InitDB(configFile)
-	} else if DBType == "mongodb" {
-		err = mongodbservice.InitDB(configFile)
-	}
-	if err != nil {
-		seelog.Error("InitDB failed, err=", err)
-	}
-
-	//start prof
-	startProfServer()
 
 	serviceString := viper.GetString("ServerApp.Services")
 	services := getServiceNameList(serviceString)
@@ -215,6 +201,10 @@ func (srv *App) Run(configFile string) {
 	}
 
 	srv.notConnectServices = getNotConnectServiceMap(viper.GetString("ServerApp.NotConnect"))
+	DBType := viper.GetString("DataDB.DBType")
+
+	//start prof
+	startProfServer()
 
 	seelog.Info("services", services)
 	if err := srv.init(services...); err != nil {
@@ -223,6 +213,17 @@ func (srv *App) Run(configFile string) {
 
 	if srv.Server != nil {
 		go srv.Server.Run()
+	}
+
+	var err error
+	if DBType == "mysql" {
+		//err = mysqlservice.InitDB(configFile)
+		_, err = mysqlservice.InitMySQL("../res/mysqlshard/mysqlShards.json")
+	} else if DBType == "mongodb" {
+		err = mongodbservice.InitDB(configFile)
+	}
+	if err != nil {
+		seelog.Error("InitDB failed, err=", err)
 	}
 
 	srv.pendingClose = make(chan bool, 1)

@@ -1,9 +1,9 @@
-package mysql
+package mysqlservice
 
 import (
 	log "github.com/cihub/seelog"
 
-	_ "github.com/go-sql-driver/mysql"
+	//_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"
 )
@@ -14,12 +14,13 @@ var (
 )
 
 // 测试时这个函数再打开
-func setConfig(configPath string) {
+/*func setConfig(configPath string) {
 	viper.SetConfigFile(configPath)
 	if err = viper.ReadInConfig(); err != nil {
 		panic("加载配置文件失败")
 	}
 }
+*/
 
 // InitDB 初始化db
 func InitDB(configPath string) (err error) {

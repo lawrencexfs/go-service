@@ -102,7 +102,7 @@ func (e *Entity) UnregSrvID() {
 	e.broadcastSrvInfo()
 }
 
-// broadcastSrvInfo 广播entity的service信息
+// broadcastSrvInfo 广播服务器信息
 func (e *Entity) broadcastSrvInfo() {
 	e.srvIDSMux.RLock()
 	defer e.srvIDSMux.RUnlock()

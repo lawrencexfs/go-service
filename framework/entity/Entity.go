@@ -294,8 +294,6 @@ func (e *Entity) OnEntityDestroyed() {
 		if ok {
 			ii.OnDestroy()
 		}
-	} else {
-		log.Info("state", e.state)
 	}
 }
 
@@ -310,7 +308,7 @@ func (e *Entity) MainLoop() {
 			}
 		}
 	}()
-
+	
 	ies := e.ieState
 
 	switch e.state {
@@ -348,6 +346,7 @@ func (e *Entity) OnEntityInit() error {
 		InsertData(dbdata, e.GetName())
 	}
 	*/
+
 	e.InitProp(GetDefs().GetDef(e.entityType), true)
 
 	e.RegSrvID()

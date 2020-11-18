@@ -1,4 +1,4 @@
-package mysql
+package mysqlservice
 
 // EscapeBytesBackslash escapes []byte with backslashes (\)
 // This escapes the contents of a string (provided as []byte) by adding backslashes before special

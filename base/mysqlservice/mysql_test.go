@@ -1,202 +1,178 @@
-package mysql
+package mysqlservice
 
 import (
-	"database/sql"
 	"fmt"
+	"reflect"
 	"testing"
+	"unsafe"
 
 	log "github.com/cihub/seelog"
+
+	"github.com/giant-tech/go-service/base/utility"
 )
 
-type Member struct {
-	UID   uint64
-	LEVEL uint32
-}
-
-// orm使用文档 https://github.com/jmoiron/sqlx
-
-func TestDBExec(t *testing.T) {
-	mysqlDB := GetMysqlDB()
-	if mysqlDB == nil {
-		log.Error("createTable failed db is nil")
-		return
-	}
-
-	_, err := mysqlDB.Exec("CREATE TABLE IF NOT EXISTS `team`(name2 text,desc2 text);")
-
+func TestMysqlShard(t *testing.T) {
+	_, err := InitMySQL("")
 	if err != nil {
-		fmt.Printf("create table faied, error:[%v]", err.Error())
-		return
-	}
-
-	_, err = mysqlDB.Exec("insert into team  values(?,?)", "aaaa", "bbbbbbbb")
-
-	if err != nil {
-		fmt.Printf("data insert faied, error:[%v]", err.Error())
-		return
+		t.Fatalf("unable to decode into struct, %v", err)
 	}
 }
 
-func TestDBQuery(t *testing.T) {
-	mysqlDB := GetMysqlDB()
-	if mysqlDB == nil {
-		log.Error("createTable failed db is nil")
-		return
+func TestSelectFromDB(t *testing.T) {
+
+	_, err := InitMySQL("")
+	if err != nil {
+		t.Fatalf("unable to decode into struct, %v", err)
 	}
 
-	type Team struct {
-		tname string `mysqlDB:"name2"`
-		tdesc string `mysqlDB:"desc2"`
+	var ID uint64
+	ID = 12
+	shard, err := GetShardObj(ID)
+	if err != nil {
+		fmt.Printf("GetShardObj failed, Id:%v", ID)
+	}
+	stmt, err := shard.MysqlObj.Prepare(`select * from player where role_id >= ? and role_id < ?;`)
+
+	if err != nil {
+		fmt.Println("======prepare failed")
 	}
 
-	team := Team{}
+	defer func() {
+		if stmt != nil {
+			stmt.Close()
+		}
+	}()
 
-	rows, err := mysqlDB.Queryx("select * from team ")
+	rows, err := stmt.Query(10, 20)
+	defer func() {
+		if rows != nil {
+			rows.Close()
+		}
+	}()
+
+	if err != nil {
+		log.Error("select data from db failed. ID:", ID, ",err:", err)
+	}
+	var roles = make(map[uint64]*Player, 0)
 
 	for rows.Next() {
-		err := rows.StructScan(&team)
-		if err != nil {
-			log.Critical(err)
+
+		//反射出未导出字段
+		val := reflect.ValueOf(rows).Elem().FieldByName("lastcols")
+
+		log.Debug("v = ", val)
+		fmt.Println("v: ", val, ", v.kind()", val.Kind())
+
+		/*for i := range v {
+
+			fmt.Println("i = ", i)
 		}
-		fmt.Printf("%#v\n", team)
-	}
+		*/
 
+		//与上面的区别是：这个是可寻址的
+		val = reflect.NewAt(val.Type(), unsafe.Pointer(val.UnsafeAddr())).Elem()
+		if reflect.Slice == val.Kind() {
+			if byteSlice, ok := val.Interface().([]byte); ok {
+				fmt.Println("byteSlice = ", byteSlice)
+			} else {
+				len := val.Len()
+
+				for i := 0; i < len; i++ {
+					/*if i < 2 {
+						fmt.Println("val.Index(i) = ", val.Index(i), ", kind=", val.Index(i).Kind(), ", interface=", val.Index(i).Interface().(int64))
+					} else {
+						fmt.Println("val.Index(i) = ", val.Index(i), ", kind=", val.Index(i).Kind(), ", interface=", val.Index(i).Interface().([]uint8))
+					}*/
+					fmt.Println(utility.ConvertReflectVal(val.Index(i).Interface()))
+				}
+			}
+		}
+
+		var newPlayer Player
+		rows.Scan(&newPlayer.ROLEID, &newPlayer.SeqID, &newPlayer.ACCOUNT, &newPlayer.NAME, &newPlayer.UUID, &newPlayer.MOBILETYPE, &newPlayer.LEVEL, &newPlayer.CREATEIP, &newPlayer.LASTIP, &newPlayer.EXP, &newPlayer.LOGINTYPE, &newPlayer.AllItem)
+
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		if newPlayer.ROLEID == uint64(0) {
+			fmt.Println(err.Error())
+		}
+
+		roles[newPlayer.ROLEID] = &newPlayer
+	}
+	err = rows.Err()
 	if err != nil {
-		fmt.Printf("create table faied, error:[%v]", err.Error())
-		return
+		fmt.Println(err.Error())
 	}
-
-	//fmt.Printf("rows = ", rows)
 }
 
-func TestDBSelect(t *testing.T) {
+func TestSelectFromDB_reflect(t *testing.T) {
 
-	mysqlDB := GetMysqlDB()
-	if mysqlDB == nil {
-		log.Error("createTable failed db is nil")
-		return
-	}
-
-	type Team struct {
-		F string `db:"name2"`
-		L string `db:"desc2"`
-	}
-
-	aaa := []Team{}
-
-	mysqlDB.Select(&aaa, "SELECT * FROM team ")
-
-	a := aaa[0]
-
-	fmt.Printf("%#v", a)
-}
-
-func TestSqlx(t *testing.T) {
-
-	/*	var schema1 = `
-		CREATE TABLE IF NOT EXISTS person (
-		    first_name text,
-		    last_name text,
-		    email text
-		);`
-
-			var schema2 = `
-		CREATE TABLE IF NOT EXISTS place (
-		    country text,
-		    city text NULL,
-		    telcode integer
-		);`*/
-	type Person struct {
-		FirstName string `db:"first_name"`
-		LastName  string `db:"last_name"`
-		Email     string
-	}
-
-	type Place struct {
-		Country string
-		City    sql.NullString
-		TelCode int
-	}
-
-	mysqlDB := GetMysqlDB()
-	if mysqlDB == nil {
-		log.Error("createTable failed db is nil")
-		return
-	}
-	// exec the schema or fail; multi-statement Exec behavior varies between
-	// database drivers;  pq will exec them all, sqlite3 won't, ymmv
-	//mysqlDB.MustExec("CREATE TABLE person (first_name text,last_name text,email text);")
-	/*	mysqlDB.MustExec(schema1)
-		mysqlDB.MustExec(schema2)
-
-		tx := mysqlDB.MustBegin()
-		tx.MustExec("INSERT INTO person (first_name, last_name, email) VALUES (?, ?, ?)", "Jason", "Moiron", "jmoiron@jmoiron.net")
-		tx.MustExec("INSERT INTO person (first_name, last_name, email) VALUES (?, ?, ?)", "John", "Doe", "johndoeDNE@gmail.net")
-		tx.MustExec("INSERT INTO place (country, city, telcode) VALUES (?, ?, ?)", "United States", "New York", "1")
-		tx.MustExec("INSERT INTO place (country, telcode) VALUES (?, ?)", "Hong Kong", "852")
-		tx.MustExec("INSERT INTO place (country, telcode) VALUES (?, ?)", "Singapore", "65")
-		// Named queries can use structs, so if you have an existing struct (i.e. person := &Person{}) that you have populated, you can pass it in as &person
-		tx.NamedExec("INSERT INTO person (first_name, last_name, email) VALUES (:first_name, :last_name, :email)", &Person{"Jane", "Citizen", "jane.citzen@example.com"})
-		tx.Commit()
-	*/
-	// Query the database, storing results in a []Person (wrapped in []interface{})
-	people := []Person{}
-	mysqlDB.Select(&people, "SELECT * FROM person ORDER BY first_name ASC")
-	jason, john := people[0], people[1]
-
-	fmt.Printf("%#v\n%#v", jason, john)
-	// Person{FirstName:"Jason", LastName:"Moiron", Email:"jmoiron@jmoiron.net"}
-	// Person{FirstName:"John", LastName:"Doe", Email:"johndoeDNE@gmail.net"}
-
-	// You can also get a single result, a la QueryRow
-	jason = Person{}
-	err = mysqlDB.Get(&jason, "SELECT * FROM person WHERE first_name=$1", "Jason")
-	fmt.Printf("%#v\n", jason)
-	// Person{FirstName:"Jason", LastName:"Moiron", Email:"jmoiron@jmoiron.net"}
-
-	// if you have null fields and use SELECT *, you must use sql.Null* in your struct
-	places := []Place{}
-	err = mysqlDB.Select(&places, "SELECT * FROM place ORDER BY telcode ASC")
+	_, err := InitMySQL("")
 	if err != nil {
-		fmt.Println(err)
-		return
+		t.Fatalf("unable to decode into struct, %v", err)
 	}
-	usa, singsing, honkers := places[0], places[1], places[2]
 
-	fmt.Printf("%#v\n%#v\n%#v\n", usa, singsing, honkers)
-	// Place{Country:"United States", City:sql.NullString{String:"New York", Valid:true}, TelCode:1}
-	// Place{Country:"Singapore", City:sql.NullString{String:"", Valid:false}, TelCode:65}
-	// Place{Country:"Hong Kong", City:sql.NullString{String:"", Valid:false}, TelCode:852}
+	var ID uint64
+	ID = 12
+	shard, err := GetShardObj(ID)
+	if err != nil {
+		fmt.Printf("GetShardObj failed, Id:%v", ID)
+	}
+	stmt, err := shard.MysqlObj.Prepare(`select * from player where role_id >= ? and role_id < ?;`)
 
-	// Loop through rows using only one struct
-	place := Place{}
-	rows, err := mysqlDB.Queryx("SELECT * FROM place")
-	for rows.Next() {
-		err = rows.StructScan(&place)
-		if err != nil {
-			log.Critical(err)
+	if err != nil {
+		fmt.Println("======prepare failed")
+	}
+
+	defer func() {
+		if stmt != nil {
+			stmt.Close()
 		}
-		fmt.Printf("%#v\n", place)
+	}()
+
+	rows, err := stmt.Query(10, 20)
+	defer func() {
+		if rows != nil {
+			rows.Close()
+		}
+	}()
+
+	if err != nil {
+		log.Error("select data from db failed. ID:", ID, ",err:", err)
 	}
-	// Place{Country:"United States", City:sql.NullString{String:"New York", Valid:true}, TelCode:1}
-	// Place{Country:"Hong Kong", City:sql.NullString{String:"", Valid:false}, TelCode:852}
-	// Place{Country:"Singapore", City:sql.NullString{String:"", Valid:false}, TelCode:65}
 
-	// Named queries, using `:name` as the bindvar.  Automatic bindvar support
-	// which takes into account the dbtype based on the driverName on sqlx.Open/Connect
-	_, err = mysqlDB.NamedExec(`INSERT INTO person (first_name,last_name,email) VALUES (:first,:last,:email)`,
-		map[string]interface{}{
-			"first": "Bin",
-			"last":  "Smuth",
-			"email": "bensmith@allblacks.nz",
-		})
+	if rows.Next() {
 
-	// Selects Mr. Smith from the database
-	rows, err = mysqlDB.NamedQuery(`SELECT * FROM person WHERE first_name=:fn`, map[string]interface{}{"fn": "Bin"})
+		//反射出未导出字段
+		val := reflect.ValueOf(rows).Elem().FieldByName("lastcols")
 
-	// Named queries can also use structs.  Their bind names follow the same rules
-	// as the name -> db mapping, so struct fields are lowercased and the `db` tag
-	// is taken into consideration.
-	rows, err = mysqlDB.NamedQuery(`SELECT * FROM person WHERE first_name=:first_name`, jason)
+		log.Debug("v = ", val)
+		fmt.Println("v: ", val, ", v.kind()", val.Kind())
 
+		//与上面的区别是：这个是可寻址的
+		val = reflect.NewAt(val.Type(), unsafe.Pointer(val.UnsafeAddr())).Elem()
+		if reflect.Slice == val.Kind() {
+			if byteSlice, ok := val.Interface().([]byte); ok {
+				fmt.Println("byteSlice = ", byteSlice)
+			} else {
+				len := val.Len()
+
+				for i := 0; i < len; i++ {
+					/*if i < 2 {
+						fmt.Println("val.Index(i) = ", val.Index(i), ", kind=", val.Index(i).Kind(), ", interface=", val.Index(i).Interface().(int64))
+					} else {
+						fmt.Println("val.Index(i) = ", val.Index(i), ", kind=", val.Index(i).Kind(), ", interface=", val.Index(i).Interface().([]uint8))
+					}*/
+					fmt.Println(utility.ConvertReflectVal(val.Index(i).Interface()))
+				}
+			}
+		}
+
+	}
+	err = rows.Err()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 }

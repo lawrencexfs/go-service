@@ -1,8 +1,15 @@
 package entity
 
 import (
+	"fmt"
+	"reflect"
+	"unsafe"
+
 	mongodbservice "github.com/giant-tech/go-service/base/mongodbservice"
 	mysqlservice "github.com/giant-tech/go-service/base/mysqlservice"
+	"github.com/giant-tech/go-service/base/utility"
+
+	"database/sql"
 
 	log "github.com/cihub/seelog"
 	"github.com/globalsign/mgo/bson"
@@ -109,24 +116,13 @@ func (e *Entity) loadFromMysqlDB() {
 		return
 	}
 
-	log.Debug("loadFromMysqlDB2.....")
-	/*	rows, err := mysqlDB.Queryx("select * from team ")
+	var err error
+	var shardObj *mysqlservice.MySQLShard
+	shardObj, err = mysqlservice.GetShardObj(e.GetEntityID())
+	if err != nil {
+		log.Debug("GetShardObj failed, EntityID:%v", e.GetEntityID())
+	}
 
-		for rows.Next() {
-			err := rows.StructScan(&team)
-			if err != nil {
-				log.Critical(err)
-			}
-			fmt.Printf("%#v\n", team)
-		}
-
-		selectProps := bson.M{}
-		for k, v := range e.props {
-			if v.def.Persistence {
-				selectProps[k] = 1
-			}
-		}
-	*/
 	var selectProps []string
 	var props_str string
 	for k, v := range e.props {
@@ -137,20 +133,51 @@ func (e *Entity) loadFromMysqlDB() {
 		}
 	}
 
-	log.Debug("loadFromMysqlDB3.....")
+	var stmt *sql.Stmt
+	stmt, err = shardObj.MysqlObj.Prepare(`select ? from ? where dbid=?;`)
+
+	defer func() {
+		if stmt != nil {
+			stmt.Close()
+		}
+	}()
+
+	rows, err := stmt.Query(props_str, PropTableName, e.GetEntityID())
+	defer func() {
+		if rows != nil {
+			rows.Close()
+		}
+	}()
+
+	if rows.Next() {
+
+		//反射出未导出字段
+		val := reflect.ValueOf(rows).Elem().FieldByName("lastcols")
+		log.Debug("v = ", val, ", v.kind()", val.Kind())
+
+		//与上面的区别是：这个是可寻址的
+		val = reflect.NewAt(val.Type(), unsafe.Pointer(val.UnsafeAddr())).Elem()
+		if reflect.Slice == val.Kind() {
+			if byteSlice, ok := val.Interface().([]byte); ok {
+				fmt.Println("byteSlice = ", byteSlice)
+			} else {
+				len := val.Len()
+				for i := 0; i < len; i++ {
+					fmt.Println(utility.ConvertReflectVal(val.Index(i).Interface()))
+				}
+			}
+		}
+	}
+
+	if err != nil {
+		log.Error("query failed, Entity ID= ", e.GetEntityID(), ",err:", err)
+	}
+
+	/*log.Debug("loadFromMysqlDB3.....")
 	db := mysqlservice.GetMysqlDB()
 	if db != nil {
 		db.Queryx("select $1 from $2 where dbid=$3", props_str, PropTableName, e.GetEntityID())
-
-		//var val_struct
-		/*for rows.Next() {
-			err := rows.StructScan(&val_struct)
-			if err != nil {
-				log.Fatalln(err)
-			}
-			fmt.Printf("%#v\n", place)
-		}*/
-	}
+	*/
 
 }
 
