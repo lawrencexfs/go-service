@@ -187,12 +187,10 @@ func (srv *App) Run(configFile string) {
 	if configFile == "" {
 		configFile = viper.GetString("configfile")
 	}
-
 	setConfig(configFile)
 	// 设置Seelog
 	zlog.InitDefault()
 	defer seelog.Flush()
-	//根据dbtype 初始化db
 
 	serviceString := viper.GetString("ServerApp.Services")
 	services := getServiceNameList(serviceString)

@@ -221,7 +221,7 @@ func (e *Entity) SavePropsToDB() {
 // LoadFromDB 从db中加载属性
 func (e *Entity) LoadFromDB() {
 
-	panic("load from db")
+	//panic("load from db")
 	//判断用哪个db
 	if DBType == "mysql" {
 		e.loadFromMysqlDB()

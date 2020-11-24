@@ -17,7 +17,13 @@ import (
 func InitDefault() {
 	logFileName := viper.GetString("Log.LogFileName")
 	logConfig := viper.GetString("Log.LogConfig")
+	if logConfig == "" {
+		logConfig = "../res/config/logConfig.xml"
+	}
 	dir := viper.GetString("Log.LogDir")
+	if dir == "" {
+		dir = "../log/"
+	}
 	Init(dir, logFileName, logConfig)
 }
 
