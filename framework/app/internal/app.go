@@ -12,6 +12,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/giant-tech/go-service/framework/entity"
+
 	mongodbservice "github.com/giant-tech/go-service/base/mongodbservice"
 	mysqlservice "github.com/giant-tech/go-service/base/mysqlservice"
 	dbservice "github.com/giant-tech/go-service/base/redisservice"
@@ -192,6 +194,8 @@ func (srv *App) Run(configFile string) {
 	zlog.InitDefault()
 	defer seelog.Flush()
 
+	setConfig(configFile)
+	setConfig(configFile)
 	serviceString := viper.GetString("ServerApp.Services")
 	services := getServiceNameList(serviceString)
 	if len(services) == 0 {
@@ -199,7 +203,8 @@ func (srv *App) Run(configFile string) {
 	}
 
 	srv.notConnectServices = getNotConnectServiceMap(viper.GetString("ServerApp.NotConnect"))
-	DBType := viper.GetString("DataDB.DBType")
+	dbtype := viper.GetString("DataDB.DBType")
+	entity.SetDBType(dbtype)
 
 	//start prof
 	startProfServer()
@@ -214,16 +219,18 @@ func (srv *App) Run(configFile string) {
 	}
 
 	var err error
-	if DBType == "mysql" {
+	if dbtype == "mysql" {
 		//err = mysqlservice.InitDB(configFile)
 		_, err = mysqlservice.InitMySQL("../res/mysqlshard/mysqlShards.json")
-	} else if DBType == "mongodb" {
+	} else if dbtype == "mongodb" {
 		err = mongodbservice.InitDB(configFile)
 	}
 	if err != nil {
 		seelog.Error("InitDB failed, err=", err)
 	}
 
+	// reset configfile
+	setConfig(configFile)
 	srv.pendingClose = make(chan bool, 1)
 	go srv.loopCheckPendingCall(srv.pendingClose)
 

@@ -31,10 +31,16 @@ func TestSelectFromDB(t *testing.T) {
 	if err != nil {
 		fmt.Printf("GetShardObj failed, Id:%v", ID)
 	}
-	stmt, err := shard.MysqlObj.Prepare(`select * from player where role_id >= ? and role_id < ?;`)
+
+	var prepare_str string
+	var table_name = "Player"
+
+	//prepare_str = fmt.Sprintf("select * from %s where role_id >= ? and role_id < ?;", table_name)
+	prepare_str = fmt.Sprintf("select level from %s where role_id= ?;", table_name)
+	stmt, err := shard.MysqlObj.Prepare(prepare_str)
 
 	if err != nil {
-		fmt.Println("======prepare failed")
+		fmt.Println("======prepare failed, err=", err)
 	}
 
 	defer func() {
@@ -43,7 +49,8 @@ func TestSelectFromDB(t *testing.T) {
 		}
 	}()
 
-	rows, err := stmt.Query(10, 20)
+	//rows, err := stmt.Query(10, 20)
+	rows, err := stmt.Query(1)
 	defer func() {
 		if rows != nil {
 			rows.Close()
@@ -175,4 +182,8 @@ func TestSelectFromDB_reflect(t *testing.T) {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+}
+
+func TestSaveToDB(t *testing.T) {
+
 }

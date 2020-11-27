@@ -15,7 +15,6 @@ import (
 
 // InitProp 初始化属性列表
 func (e *Entity) InitProp(def *Def, loadFromDB bool) {
-
 	if def == nil {
 		return
 	}
@@ -32,11 +31,15 @@ func (e *Entity) InitProp(def *Def, loadFromDB bool) {
 
 	// 读取server.toml里的数据库配置
 
-	DBType = viper.GetString("DataDB.DBType")
-	PropDBName = viper.GetString("DataDB.GameDBName")
-	PropTableName = viper.GetString("DataDB.GameTableName")
+	db := viper.GetString("DB.Addr")
+	idle := viper.GetString("DB.MaxIdle")
+	log.Debug("Entity InitProp DB =", db, ", idle=", idle)
 
-	log.Debug("InitProp dbtype =", DBType, ", PropDBName=", PropDBName, ", PropTableName=", PropTableName)
+	//DBType = viper.GetString("DataDB.DBType")
+	PropDBName = viper.GetString("DataDB.GameDBName")
+	PropTableName = "Player"
+
+	log.Debug("Entity InitProp dbtype =", DBType, ", PropDBName=", PropDBName, ", PropTableName=", PropTableName, ",table===")
 	//panic("begin load from db, dbtype=")
 	if loadFromDB {
 		e.LoadFromDB()

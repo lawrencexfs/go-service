@@ -1,17 +1,12 @@
 package mysqlservice
 
-import (
-	log "github.com/cihub/seelog"
+//_ "github.com/go-sql-driver/mysql"
+//"github.com/jmoiron/sqlx"
 
-	//_ "github.com/go-sql-driver/mysql"
-	"github.com/jmoiron/sqlx"
-	"github.com/spf13/viper"
-)
-
-var (
+/*var (
 	mysqlDB *sqlx.DB
 	err     error
-)
+)*/
 
 // 测试时这个函数再打开
 /*func setConfig(configPath string) {
@@ -23,7 +18,7 @@ var (
 */
 
 // InitDB 初始化db
-func InitDB(configPath string) (err error) {
+/*func InitDB(configPath string) (err error) {
 	if configPath == "" {
 		log.Info("InitDB, configPath is nil, read db_test.toml config just for test")
 		configPath = "./db_test.toml"
@@ -81,3 +76,4 @@ func GetMysqlDB() *sqlx.DB {
 	log.Info("get mysql db success")
 	return mysqlDB
 }
+*/

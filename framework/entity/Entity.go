@@ -203,6 +203,7 @@ func (e *Entity) GetEntitySrvID(srvType uint8) (uint64, uint64, error) {
 }
 
 // SetName 设置实体Name并更新name管理器
+// 目前没有用到
 func (e *Entity) SetName(name string) error {
 	if name == e.entityName {
 		return nil
@@ -308,7 +309,7 @@ func (e *Entity) MainLoop() {
 			}
 		}
 	}()
-	
+
 	ies := e.ieState
 
 	switch e.state {
