@@ -133,15 +133,26 @@ func (e *Entity) loadFromMysqlDB() {
 		log.Error("GetShardObj failed, EntityID:%v", e.GetEntityID())
 	}
 
+	type ValInfo struct {
+		colname string
+		val     interface{}
+	}
+	var valArray []ValInfo
 	var props_str string
 	var number = 0
+	var valinfo ValInfo
 
 	for k, v := range e.props {
 		if v.def.Persistence {
 			if number >= 1 {
+				valinfo.colname = k
 				k = "," + k
+			} else {
+
+				valinfo.colname = k
 			}
 			props_str = props_str + k
+			valArray = append(valArray, valinfo)
 			number++
 		}
 	}
@@ -194,6 +205,8 @@ func (e *Entity) loadFromMysqlDB() {
 				len := val.Len()
 				for i := 0; i < len; i++ {
 					log.Debug(utility.ConvertReflectVal(val.Index(i).Interface()))
+					//valArray[i].val = utility.ConvertReflectVal(val.Index(i).Interface())
+					valArray[i].val = val.Index(i).Interface()
 				}
 			}
 		}
@@ -201,6 +214,17 @@ func (e *Entity) loadFromMysqlDB() {
 
 	if err != nil {
 		log.Error("query failed, Entity ID= ", e.GetEntityID(), ",err:", err)
+	}
+
+	for _, v := range valArray {
+
+		info, ok := e.props[v.colname]
+		if ok {
+			log.Debug("loadFromMysqlDB")
+			info.UnPackMysqlValue(v.val)
+		} else {
+			log.Error("loadFromDB, prop not exist: ", v.colname)
+		}
 	}
 
 	/*log.Debug("loadFromMysqlDB3.....")

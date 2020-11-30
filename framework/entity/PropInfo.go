@@ -7,8 +7,8 @@ import (
 
 	log "github.com/cihub/seelog"
 	"github.com/garyburd/redigo/redis"
-	"github.com/globalsign/mgo/bson"
 	"github.com/giant-tech/go-service/base/utility"
+	"github.com/globalsign/mgo/bson"
 )
 
 // PropInfo 属性相关
@@ -326,6 +326,44 @@ func (p *PropInfo) UnPackMongoValue(data interface{}, elems []bson.RawDocElem) {
 			}
 		}
 		log.Warn("prop complex type: ", p.def.TypeName)
+
+	}
+}
+
+// UnPackMysqlValue 从mysql中恢复Value
+func (p *PropInfo) UnPackMysqlValue(data interface{}) {
+	if data == nil {
+		return
+	}
+
+	switch p.def.TypeName {
+	case "bool":
+		p.value = data.(bool)
+	case "int8":
+		p.value = int8(data.(int))
+	case "int16":
+		p.value = int16(data.(int))
+	case "int32":
+		p.value = int32(data.(int))
+	case "int64":
+		p.value = data.(int64)
+	case "uint8":
+		p.value = uint64(data.(int64))
+	case "uint16":
+		p.value = uint16(data.(int64))
+	case "uint32":
+		p.value = uint32(data.(int64))
+	case "uint64":
+		p.value = uint64(data.(int64))
+	case "float32":
+		p.value = float32(data.(float64))
+	case "float64":
+		p.value = float64(data.(float64))
+	case "string":
+		p.value = data.(string)
+	default:
+
+		log.Warn("not knows type: ", p.def.TypeName)
 
 	}
 }
