@@ -360,10 +360,15 @@ func (p *PropInfo) UnPackMysqlValue(data interface{}) {
 	case "float64":
 		p.value = float64(data.(float64))
 	case "string":
-		p.value = data.(string)
+		ba := []byte{}
+		for _, b := range data.([]uint8) {
+			ba = append(ba, byte(b))
+		}
+		p.value = string(ba)
 	default:
 
 		log.Warn("not knows type: ", p.def.TypeName)
 
 	}
 }
+                                                

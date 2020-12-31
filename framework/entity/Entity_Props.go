@@ -1,20 +1,136 @@
 package entity
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
+	"runtime/debug"
 
+	mysqlservice "github.com/giant-tech/go-service/base/mysqlservice"
 	"github.com/giant-tech/go-service/base/stream"
 
 	log "github.com/cihub/seelog"
 
 	"github.com/giant-tech/go-service/framework/idata"
-
-	"github.com/spf13/viper"
 )
 
+// InitData 初始化data
+func (e *Entity) CreateEntityTable() {
+	if GetDBType() == "mysql" {
+		//创建entity数据库表
+		var err error
+		var shardObj *mysqlservice.MySQLShard
+		shardObj, err = mysqlservice.GetShardObj(e.GetEntityID())
+		if err != nil {
+			log.Error("OnEntityInit GetShardObj failed, EntityID:%v", e.GetEntityID())
+		}
+
+		sqlBuf := bytes.NewBufferString("CREATE TABLE IF NOT EXISTS`")
+		sqlBuf.WriteString(e.entityType)
+		sqlBuf.WriteString("`")
+		sqlBuf.WriteString("(")
+		sqlBuf.WriteString(" \n")
+
+		sqlBuf.WriteString("	`ID` bigint(0) UNSIGNED NOT NULL AUTO_INCREMENT,")
+		sqlBuf.WriteString(" \n")
+		sqlBuf.WriteString("	`entity_id` bigint(0) NOT NULL,")
+		sqlBuf.WriteString(" \n")
+
+		//add prop
+		for name, prop := range e.props {
+			st := prop.def.TypeName
+			switch st {
+			case "bool", "int8":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" tinyint(0) NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "int16":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" smallint(0) NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "int32":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" int(0) NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "int64":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" bigint(0) NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "uint8":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" tinyint(0) UNSIGNED NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "uint16":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" smallint(0) UNSIGNED NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "uint32":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" int(0) UNSIGNED NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "uint64":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" bigint(0) UNSIGNED NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "string":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "float32":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" float NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "float64":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" double NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			}
+		}
+
+		sqlBuf.WriteString("	PRIMARY KEY (`ID`) USING BTREE")
+		sqlBuf.WriteString("\n")
+		sqlBuf.WriteString(") ENGINE = InnoDB AUTO_INCREMENT = 200 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;")
+
+		/*sql := "IF NOT EXISTS `Player`;
+		CREATE TABLE `Player`  (
+		  `ID` bigint(0) UNSIGNED NOT NULL AUTO_INCREMENT,
+		  `ENTITY_TYPE` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+		  PRIMARY KEY (`mailID`, `receiverID`) USING BTREE
+		) ENGINE = InnoDB AUTO_INCREMENT = 200 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+		*/
+		result, err := shardObj.MysqlObj.Exec(sqlBuf.String())
+		if err != nil {
+			log.Error("result= ", result, ", err=", err, ", sql str=", sqlBuf.String(), ", stack=", string(debug.Stack()))
+		}
+
+	}
+	//todo:mongodb不需要事先创建表
+}
+
 // InitProp 初始化属性列表
-func (e *Entity) InitProp(def *Def, loadFromDB bool) {
+func (e *Entity) InitProp(def *Def) {
 	if def == nil {
 		return
 	}
@@ -30,8 +146,7 @@ func (e *Entity) InitProp(def *Def, loadFromDB bool) {
 	}
 
 	// 读取server.toml里的数据库配置
-
-	db := viper.GetString("DB.Addr")
+	/*db := viper.GetString("DB.Addr")
 	idle := viper.GetString("DB.MaxIdle")
 	log.Debug("Entity InitProp DB =", db, ", idle=", idle)
 
@@ -40,10 +155,8 @@ func (e *Entity) InitProp(def *Def, loadFromDB bool) {
 	PropTableName = "Player"
 
 	log.Debug("Entity InitProp dbtype =", DBType, ", PropDBName=", PropDBName, ", PropTableName=", PropTableName, ",table===")
-	//panic("begin load from db, dbtype=")
-	if loadFromDB {
-		e.LoadFromDB()
-	}
+	*/
+
 }
 
 // addProp 添加属性

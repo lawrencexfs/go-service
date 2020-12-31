@@ -348,7 +348,11 @@ func (e *Entity) OnEntityInit() error {
 	}
 	*/
 
-	e.InitProp(GetDefs().GetDef(e.entityType), true)
+	e.InitProp(GetDefs().GetDef(e.entityType))
+
+	e.CreateEntityTable()
+
+	e.LoadFromDB()
 
 	e.RegSrvID()
 
