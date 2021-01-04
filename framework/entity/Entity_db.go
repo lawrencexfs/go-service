@@ -20,6 +20,7 @@ import (
 
 // DBType dbtype
 var DBType string
+var isAutoLoadSave bool
 
 // PropDBName PropDBName
 var PropDBName string
@@ -35,6 +36,14 @@ func SetDBType(dbtype string) {
 
 func GetDBType() string {
 	return DBType
+}
+
+func IsAutoLoadSave() bool {
+	return isAutoLoadSave
+}
+
+func SetLoadSaveFlag(flag bool) {
+	isAutoLoadSave = flag
 }
 
 // loadFromMongoDB 从数据库中恢复

@@ -205,7 +205,9 @@ func (srv *App) Run(configFile string) {
 	srv.notConnectServices = getNotConnectServiceMap(viper.GetString("ServerApp.NotConnect"))
 	dbtype := viper.GetString("DataDB.DBType")
 	entity.SetDBType(dbtype)
-
+	//设置entity是否自动从数据库加载保存属性数据
+	flag := viper.GetBool("DataDB.IsAutoLoadSave")
+	entity.SetLoadSaveFlag(flag)
 	//start prof
 	startProfServer()
 

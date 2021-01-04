@@ -352,7 +352,9 @@ func (e *Entity) OnEntityInit() error {
 
 	e.CreateEntityTable()
 
-	e.LoadFromDB()
+	if IsAutoLoadSave() {
+		e.LoadFromDB()
+	}
 
 	e.RegSrvID()
 
