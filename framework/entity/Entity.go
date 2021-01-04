@@ -350,9 +350,8 @@ func (e *Entity) OnEntityInit() error {
 
 	e.InitProp(GetDefs().GetDef(e.entityType))
 
-	e.CreateEntityTable()
-
 	if IsAutoLoadSave() {
+		e.CreateEntityTable()
 		e.LoadFromDB()
 	}
 
