@@ -76,6 +76,9 @@ type Entity struct {
 
 	// DataC 是向本实体发送消息的Channel
 	DataC chan *idata.CallData
+
+	// 是否在数据库创建entity表,主要用于mysql,mongodb不需要
+	isCreateTable bool
 }
 
 // DBData entity初始db数据
