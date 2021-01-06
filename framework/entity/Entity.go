@@ -78,7 +78,7 @@ type Entity struct {
 	DataC chan *idata.CallData
 
 	// 是否在数据库创建entity表,主要用于mysql,mongodb不需要
-	isCreateTable bool
+	//isCreateTable bool
 }
 
 // DBData entity初始db数据

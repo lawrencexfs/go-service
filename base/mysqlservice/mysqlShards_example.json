@@ -1,0 +1,194 @@
+{
+	"groups": [
+		{
+			"groupid": 1001,
+			"version": 200000,
+			"name": "group1000",
+			"factor": 2,
+			"shards": [
+				{
+					"shardid": 1001001,
+					"name": "shard1",
+					"hashval": 0,
+					"cells": [
+						{
+							"cellid": 1001001001,
+							"name": "cell1",
+							"addr": "dev:dev123@tcp(10.23.118.52:3306)/test_db0?charset=utf8mb4&multiStatements=true&interpolateParams=true",
+							"startid": 0,
+							"endid": 100000,
+							"maxidleconn": 2,
+							"maxopenconn": 100,
+							"connshardread": 2,
+							"connshardwrite": 4
+						},
+						{
+							"cellid": 1001001002,
+							"name": "cell2",
+							"addr": "dev:dev123@tcp(10.23.118.52:3306)/test_db1?charset=utf8mb4&multiStatements=true&interpolateParams=true",
+							"startid": 100000,
+							"endid": 200000,
+							"maxidleconn": 2,
+							"maxopenconn": 100,
+							"connshardread": 2,
+							"connshardwrite": 4
+						}
+					]
+				},
+				{
+					"shardid": 1002,
+					"name": "shard2",
+					"hashval": 1,
+					"cells": [
+						{
+							"cellid": 1001002001,
+							"name": "cell1",
+							"addr": "dev:dev123@tcp(10.23.118.52:3306)/test_db2?charset=utf8mb4&multiStatements=true&interpolateParams=true",
+							"startid": 0,
+							"endid": 100000,
+							"maxidleconn": 2,
+							"maxopenconn": 100,
+							"connshardread": 2,
+							"connshardwrite": 4
+						},
+						{
+							"cellid": 1001002002,
+							"name": "cell2",
+							"addr": "dev:dev123@tcp(10.23.118.52:3306)/test_db3?charset=utf8mb4&multiStatements=true&interpolateParams=true",
+							"startid": 100000,
+							"endid": 200000,
+							"maxidleconn": 2,
+							"maxopenconn": 100,
+							"connshardread": 2,
+							"connshardwrite": 4
+						}
+					]
+				}
+			]
+		},
+		{
+			"groupid": 1002,
+			"version": 200000,
+			"name": "group1001",
+			"factor": 4,
+			"shards": [
+				{
+					"shardid": 1002001,
+					"name": "shard3",
+					"hashval": 0,
+					"cells": [
+						{
+							"cellid": 1002001001,
+							"name": "cell3",
+							"addr": "dev:dev123@tcp(10.23.118.52:3306)/test_db4?charset=utf8mb4&multiStatements=true&interpolateParams=true",
+							"startid": 200000,
+							"endid": 600000,
+							"maxidleconn": 2,
+							"maxopenconn": 100,
+							"connshardread": 2,
+							"connshardwrite": 4
+						},
+						{
+							"cellid": 1002001002,
+							"name": "cell4",
+							"addr": "dev:dev123@tcp(10.23.118.52:3306)/test_db5?charset=utf8mb4&multiStatements=true&interpolateParams=true",
+							"startid": 600000,
+							"endid": 1000000,
+							"maxidleconn": 2,
+							"maxopenconn": 100,
+							"connshardread": 2,
+							"connshardwrite": 4
+						}
+					]
+				},
+				{
+					"shardid": 1002002,
+					"name": "shard4",
+					"hashval": 1,
+					"cells": [
+						{
+							"cellid": 1002002001,
+							"name": "cell3",
+							"addr": "dev:dev123@tcp(10.23.118.52:3306)/test_db6?charset=utf8mb4&multiStatements=true&interpolateParams=true",
+							"startid": 200000,
+							"endid": 600000,
+							"maxidleconn": 2,
+							"maxopenconn": 100,
+							"connshardread": 2,
+							"connshardwrite": 4
+						},
+						{
+							"cellid": 1002002002,
+							"name": "cell2",
+							"addr": "dev:dev123@tcp(10.23.118.52:3306)/test_db7?charset=utf8mb4&multiStatements=true&interpolateParams=true",
+							"startid": 600000,
+							"endid": 1000000,
+							"maxidleconn": 2,
+							"maxopenconn": 100,
+							"connshardread": 2,
+							"connshardwrite": 4
+						}
+					]
+				},
+				{
+					"shardid": 1002003,
+					"name": "shard5",
+					"hashval": 2,
+					"cells": [
+						{
+							"cellid": 1002003001,
+							"name": "cell3",
+							"addr": "dev:dev123@tcp(10.23.118.52:3306)/test_db8?charset=utf8mb4&multiStatements=true&interpolateParams=true",
+							"startid": 200000,
+							"endid": 600000,
+							"maxidleconn": 2,
+							"maxopenconn": 100,
+							"connshardread": 2,
+							"connshardwrite": 4
+						},
+						{
+							"cellid": 1002003002,
+							"name": "cell2",
+							"addr": "dev:dev123@tcp(10.23.118.52:3306)/test_db9?charset=utf8mb4&multiStatements=true&interpolateParams=true",
+							"startid": 600000,
+							"endid": 1000000,
+							"maxidleconn": 2,
+							"maxopenconn": 100,
+							"connshardread": 2,
+							"connshardwrite": 4
+						}
+					]
+				},
+				{
+					"shardid": 1002004,
+					"name": "shard6",
+					"hashval": 3,
+					"cells": [
+						{
+							"cellid": 1002004001,
+							"name": "cell3",
+							"addr": "dev:dev123@tcp(10.23.118.52:3306)/test_db8?charset=utf8mb4&multiStatements=true&interpolateParams=true",
+							"startid": 200000,
+							"endid": 600000,
+							"maxidleconn": 2,
+							"maxopenconn": 100,
+							"connshardread": 2,
+							"connshardwrite": 4
+						},
+						{
+							"cellid": 1002004002,
+							"name": "cell2",
+							"addr": "dev:dev123@tcp(10.23.118.52:3306)/test_db9?charset=utf8mb4&multiStatements=true&interpolateParams=true",
+							"startid": 600000,
+							"endid": 1000000,
+							"maxidleconn": 2,
+							"maxopenconn": 100,
+							"connshardread": 2,
+							"connshardwrite": 4
+						}
+					]
+				}
+			]
+		}
+	]
+}

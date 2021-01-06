@@ -16,7 +16,7 @@ import (
 
 // InitData 初始化data
 func (e *Entity) CreateEntityTable() {
-	if GetDBType() == "mysql" && e.isCreateTable {
+	if GetDBType() == "mysql" /* && e.isCreateTable*/ {
 		//创建entity数据库表
 		var err error
 		var shardObj *mysqlservice.MySQLShard
@@ -38,77 +38,77 @@ func (e *Entity) CreateEntityTable() {
 
 		//add prop
 		for name, prop := range e.props {
-			if prop.def.Persistence {
-				st := prop.def.TypeName
-				switch st {
-				case "bool", "int8":
-					sqlBuf.WriteString("	`")
-					sqlBuf.WriteString(name)
-					sqlBuf.WriteString("`")
-					sqlBuf.WriteString(" tinyint(0) NULL DEFAULT NULL,")
-					sqlBuf.WriteString(" \n")
-				case "int16":
-					sqlBuf.WriteString("	`")
-					sqlBuf.WriteString(name)
-					sqlBuf.WriteString("`")
-					sqlBuf.WriteString(" smallint(0) NULL DEFAULT NULL,")
-					sqlBuf.WriteString(" \n")
-				case "int32":
-					sqlBuf.WriteString("	`")
-					sqlBuf.WriteString(name)
-					sqlBuf.WriteString("`")
-					sqlBuf.WriteString(" int(0) NULL DEFAULT NULL,")
-					sqlBuf.WriteString(" \n")
-				case "int64":
-					sqlBuf.WriteString("	`")
-					sqlBuf.WriteString(name)
-					sqlBuf.WriteString("`")
-					sqlBuf.WriteString(" bigint(0) NULL DEFAULT NULL,")
-					sqlBuf.WriteString(" \n")
-				case "uint8":
-					sqlBuf.WriteString("	`")
-					sqlBuf.WriteString(name)
-					sqlBuf.WriteString("`")
-					sqlBuf.WriteString(" tinyint(0) UNSIGNED NULL DEFAULT NULL,")
-					sqlBuf.WriteString(" \n")
-				case "uint16":
-					sqlBuf.WriteString("	`")
-					sqlBuf.WriteString(name)
-					sqlBuf.WriteString("`")
-					sqlBuf.WriteString(" smallint(0) UNSIGNED NULL DEFAULT NULL,")
-					sqlBuf.WriteString(" \n")
-				case "uint32":
-					sqlBuf.WriteString("	`")
-					sqlBuf.WriteString(name)
-					sqlBuf.WriteString("`")
-					sqlBuf.WriteString(" int(0) UNSIGNED NULL DEFAULT NULL,")
-					sqlBuf.WriteString(" \n")
-				case "uint64":
-					sqlBuf.WriteString("	`")
-					sqlBuf.WriteString(name)
-					sqlBuf.WriteString("`")
-					sqlBuf.WriteString(" bigint(0) UNSIGNED NULL DEFAULT NULL,")
-					sqlBuf.WriteString(" \n")
-				case "string":
-					sqlBuf.WriteString("	`")
-					sqlBuf.WriteString(name)
-					sqlBuf.WriteString("`")
-					sqlBuf.WriteString(" varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,")
-					sqlBuf.WriteString(" \n")
-				case "float32":
-					sqlBuf.WriteString("	`")
-					sqlBuf.WriteString(name)
-					sqlBuf.WriteString("`")
-					sqlBuf.WriteString(" float NULL DEFAULT NULL,")
-					sqlBuf.WriteString(" \n")
-				case "float64":
-					sqlBuf.WriteString("	`")
-					sqlBuf.WriteString(name)
-					sqlBuf.WriteString("`")
-					sqlBuf.WriteString(" double NULL DEFAULT NULL,")
-					sqlBuf.WriteString(" \n")
-				}
+			//if prop.def.Persistence {
+			st := prop.def.TypeName
+			switch st {
+			case "bool", "int8":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" tinyint(0) NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "int16":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" smallint(0) NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "int32":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" int(0) NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "int64":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" bigint(0) NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "uint8":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" tinyint(0) UNSIGNED NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "uint16":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" smallint(0) UNSIGNED NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "uint32":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" int(0) UNSIGNED NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "uint64":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" bigint(0) UNSIGNED NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "string":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "float32":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" float NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
+			case "float64":
+				sqlBuf.WriteString("	`")
+				sqlBuf.WriteString(name)
+				sqlBuf.WriteString("`")
+				sqlBuf.WriteString(" double NULL DEFAULT NULL,")
+				sqlBuf.WriteString(" \n")
 			}
+			//}
 		}
 
 		sqlBuf.WriteString("	PRIMARY KEY (`ID`) USING BTREE")
@@ -137,7 +137,7 @@ func (e *Entity) InitProp(def *Def) {
 		return
 	}
 
-	e.isCreateTable = false
+	//e.isCreateTable = false
 	e.def = def
 	for _, p := range e.def.Props {
 		for _, sType := range p.Sync {
@@ -145,7 +145,7 @@ func (e *Entity) InitProp(def *Def) {
 				e.addProp(p)
 				//只要有一个属性需要持久化，就创建entity数据库表
 				if p.Persistence {
-					e.isCreateTable = true
+					//e.isCreateTable = true
 				}
 				break
 			}
@@ -283,7 +283,7 @@ func (e *Entity) SyncProps() {
 		return
 	}
 
-	log.Debug("SyncProps len: ", len(e.dirtyPropList))
+	log.Debug("Entity:", e.GetEntityID(), "SyncProps len: ", len(e.dirtyPropList))
 
 	for _, p := range e.dirtyPropList {
 		for _, s := range p.def.Sync {

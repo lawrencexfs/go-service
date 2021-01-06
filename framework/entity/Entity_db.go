@@ -8,7 +8,6 @@ import (
 
 	mongodbservice "github.com/giant-tech/go-service/base/mongodbservice"
 	mysqlservice "github.com/giant-tech/go-service/base/mysqlservice"
-	"github.com/giant-tech/go-service/base/utility"
 	utils "github.com/giant-tech/go-service/base/utility"
 	"github.com/go-sql-driver/mysql"
 
@@ -133,7 +132,6 @@ func (e *Entity) savePropsToMongoDB() {
 // loadFromMysqlDB 从mysql加载数据
 func (e *Entity) loadFromMysqlDB() {
 
-	log.Debug("loadFromMysqlDB")
 	if e.GetEntityID() == 0 {
 		return
 	}
@@ -174,7 +172,7 @@ func (e *Entity) loadFromMysqlDB() {
 		var prepare_str string
 		prepare_str = fmt.Sprintf("select %s from %s where entity_id=?;", props_str, e.GetType())
 
-		log.Debug("prepare_str: ", prepare_str, " entityID=", ", entitytype=", e.GetType())
+		log.Debug(" loadFromMysqlDB prepare_str: ", prepare_str, " entityID=", e.GetEntityID(), ", entitytype=", e.GetType())
 		//stmt, err = shardObj.MysqlObj.Prepare(`select ? from ? where role_id=?;`)
 		stmt, err = shardObj.MysqlObj.Prepare(prepare_str)
 		if stmt == nil || err != nil {
@@ -187,60 +185,58 @@ func (e *Entity) loadFromMysqlDB() {
 					log.Error("loadFromMysqlDB stmt nil, err = ", err)
 				}
 			}
-		}
+		} else {
+			rows, err := stmt.Query( /*props_str, */ e.GetEntityID())
+			if err != nil {
+				log.Error("loadFromMysqlDB stmt Query failed err = ", err)
+			}
 
-		rows, err := stmt.Query( /*props_str, */ e.GetEntityID())
-		if err != nil {
-			log.Error("loadFromMysqlDB stmt Query failed err = ", err)
-		}
+			if rows.Next() {
 
-		if rows.Next() {
+				//反射出未导出字段
+				val := reflect.ValueOf(rows).Elem().FieldByName("lastcols")
+				//log.Debug("v = ", val, ", v.kind(): ", val.Kind())
 
-			//反射出未导出字段
-			val := reflect.ValueOf(rows).Elem().FieldByName("lastcols")
-			log.Debug("v = ", val, ", v.kind(): ", val.Kind())
-
-			//与上面的区别是：这个是可寻址的
-			val = reflect.NewAt(val.Type(), unsafe.Pointer(val.UnsafeAddr())).Elem()
-			log.Debug("after reflect, val = ", val)
-			if reflect.Slice == val.Kind() {
-				log.Debug("val.Kind = ", val)
-				if byteSlice, ok := val.Interface().([]byte); ok {
-					log.Debug("byteSlice = ", byteSlice)
-				} else {
-					len := val.Len()
-					for i := 0; i < len; i++ {
-						log.Debug(utility.ConvertReflectVal(val.Index(i).Interface()))
-						//valArray[i].val = utility.ConvertReflectVal(val.Index(i).Interface())
-						valArray[i].val = val.Index(i).Interface()
+				//与上面的区别是：这个是可寻址的
+				val = reflect.NewAt(val.Type(), unsafe.Pointer(val.UnsafeAddr())).Elem()
+				//log.Debug("after reflect, val = ", val)
+				if reflect.Slice == val.Kind() {
+					//log.Debug("val.Kind = ", val)
+					if byteSlice, ok := val.Interface().([]byte); ok {
+						log.Debug("byteSlice = ", byteSlice)
+					} else {
+						len := val.Len()
+						for i := 0; i < len; i++ {
+							//log.Debug(utility.ConvertReflectVal(val.Index(i).Interface()))
+							valArray[i].val = val.Index(i).Interface()
+						}
 					}
 				}
-			}
-			for _, v := range valArray {
+				for _, v := range valArray {
 
-				info, ok := e.props[v.colname]
-				if ok {
-					log.Debug("loadFromMysqlDB")
-					info.UnPackMysqlValue(v.val)
-				} else {
-					log.Error("loadFromMysqlDB, prop not exist: ", v.colname)
+					info, ok := e.props[v.colname]
+					if ok {
+						info.UnPackMysqlValue(v.val)
+					} else {
+						log.Error("loadFromMysqlDB, prop not exist: ", v.colname)
+					}
 				}
-			}
-		} else {
-			//没有查询到entity的记录，创建角色，插入一行entity记录
-			insertBuf := bytes.NewBufferString("INSERT INTO ")
-			insertBuf.WriteString(e.entityType)
-			insertBuf.WriteString(" (entity_id)")
-			//insertBuf.WriteString(string(esc(props_str)))
-			insertBuf.WriteString(" VALUES(")
-			insertBuf.WriteString(utils.ConvertTypeToString(e.GetEntityID()))
-			insertBuf.WriteString(" );")
-
-			_, err := shardObj.MysqlObj.Exec(insertBuf.String())
-			if err != nil {
-				log.Error("loadFromMysqlDB insert sql:", insertBuf.String(), "error:", err)
 			} else {
-				log.Info("loadFromMysqlDB insert sql:", insertBuf.String())
+				//没有查询到entity的记录，创建角色，插入一行entity记录
+				insertBuf := bytes.NewBufferString("INSERT INTO ")
+				insertBuf.WriteString(e.entityType)
+				insertBuf.WriteString(" (entity_id)")
+				//insertBuf.WriteString(string(esc(props_str)))
+				insertBuf.WriteString(" VALUES(")
+				insertBuf.WriteString(utils.ConvertTypeToString(e.GetEntityID()))
+				insertBuf.WriteString(" );")
+
+				_, err := shardObj.MysqlObj.Exec(insertBuf.String())
+				if err != nil {
+					log.Error("loadFromMysqlDB insert sql:", insertBuf.String(), "error:", err)
+				} else {
+					log.Info("loadFromMysqlDB insert sql:", insertBuf.String())
+				}
 			}
 		}
 	} else {
@@ -258,7 +254,7 @@ func (e *Entity) savePropsToMysqlDB() {
 		return
 	}
 
-	log.Debug("savePropsToMysqlDB SyncProps len: ", len(e.dirtySaveProps))
+	log.Debug("Entity", e.GetEntityID(), " savePropsToMysqlDB SyncProps len: ", len(e.dirtySaveProps))
 
 	//拼凑属性更新语句，更新到mysql数据库
 	insertBuf := bytes.NewBufferString("update  ")
@@ -285,9 +281,9 @@ func (e *Entity) savePropsToMysqlDB() {
 
 	_, err = shardObj.MysqlObj.Exec(insertBuf.String())
 	if err != nil {
-		log.Error("savePropsToMysqlDB insertBuf= ", insertBuf.String(), " , error:", err)
+		log.Error("Entity", e.GetEntityID(), "savePropsToMysqlDB insertBuf= ", insertBuf.String(), " , error:", err)
 	} else {
-		log.Debug("savePropsToMysqlDB insert sql: ", insertBuf.String(), " success")
+		log.Debug("Entity", e.GetEntityID(), "savePropsToMysqlDB insert sql: ", insertBuf.String(), " success")
 	}
 
 	//清空数据

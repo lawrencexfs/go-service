@@ -1,0 +1,41 @@
+{
+    "groups": [
+        {
+            "groupid": 1001,
+            "version": 200000,
+            "name": "group1000",
+            "factor": 1,
+            "shards": [
+                {
+                    "shardid": 1001001,
+                    "name": "shard1",
+                    "hashval": 0,
+                    "cells": [
+                        {
+                            "cellid": 1001001001,
+                            "name": "cell1",
+                            "addr": "root:123456@tcp(10.23.25.22:3306)/test_db?charset=utf8&parseTime=True&loc=Local",
+                            "startid": 0,
+                            "endid": 100000,
+                            "maxidleconn": 2,
+                            "maxopenconn": 100,
+                            "connshardread": 1,
+                            "connshardwrite": 1
+                        },
+                        {
+                            "cellid": 1001001002,
+                            "name": "cell2",
+                            "addr": "root:123456@tcp(10.23.25.22:3306)/test_db?charset=utf8&parseTime=True&loc=Local",
+                            "startid": 100000,
+                            "endid": 200000,
+                            "maxidleconn": 2,
+                            "maxopenconn": 100,
+                            "connshardread": 1,
+                            "connshardwrite": 1
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
