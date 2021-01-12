@@ -126,9 +126,9 @@ func (def *Def) fill(jsonInfo map[string]interface{}) error {
 			prop.DefaultValue = defautV.(string)
 		}
 
-		if strings.Contains(prop.TypeName, "protoMsg") {
+		/*	if strings.Contains(prop.TypeName, "protoMsg") {
 			prop.TypeName = prop.TypeName[10:]
-		}
+		}*/
 		prop.Persistence = true
 		if persistence, ok := jsonProp["save"].(string); ok {
 			if persistence == "0" {

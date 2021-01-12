@@ -165,15 +165,15 @@ func ReInitMysql(cfgPath string) error {
 
 	shardCfg, err := ReloadShardConfig(cfgPath)
 	if err != nil {
-		log.Error("mysql conf error")
-		return fmt.Errorf("mysql conf error")
+		log.Error("ReInitMysql mysql conf error")
+		return fmt.Errorf("ReInitMysql mysql conf error")
 	}
 
 	allCells := GetAllCellCfg(shardCfg)
 	shardCount := len(allCells)
 	if shardCount == 0 {
-		log.Error("mysql conf error")
-		return fmt.Errorf("mysql conf error")
+		log.Error("ReInitMysql mysql conf error")
+		return fmt.Errorf("ReInitMysql mysql conf error")
 	}
 
 	// 初始化 读数据库连接

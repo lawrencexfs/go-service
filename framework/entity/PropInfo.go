@@ -61,7 +61,13 @@ func (p *PropInfo) init() {
 		p.value = float64(utility.Atof(p.def.DefaultValue))
 	case "string":
 		p.value = p.def.DefaultValue
+
 	default:
+		//protobuf
+		/*	if strings.Contains(p.def.TypeName, "protoMsg") {
+			prop.TypeName = prop.TypeName[10:]
+		}*/
+
 		var err error
 		p.value, err = p.def.CreateInst()
 		if err != nil {
@@ -371,4 +377,3 @@ func (p *PropInfo) UnPackMysqlValue(data interface{}) {
 
 	}
 }
-                                                

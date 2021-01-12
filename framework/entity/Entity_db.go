@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"fmt"
 	"reflect"
+	"strings"
 	"unsafe"
 
 	mongodbservice "github.com/giant-tech/go-service/base/mongodbservice"
 	mysqlservice "github.com/giant-tech/go-service/base/mysqlservice"
 	utils "github.com/giant-tech/go-service/base/utility"
 	"github.com/go-sql-driver/mysql"
+	"github.com/gogo/protobuf/proto"
 
 	"database/sql"
 
@@ -254,19 +256,37 @@ func (e *Entity) savePropsToMysqlDB() {
 		return
 	}
 
-	log.Debug("Entity", e.GetEntityID(), " savePropsToMysqlDB SyncProps len: ", len(e.dirtySaveProps))
+	log.Debug("Entity: ", e.GetEntityID(), " savePropsToMysqlDB SyncProps len: ", len(e.dirtySaveProps))
 
 	//拼凑属性更新语句，更新到mysql数据库
-	insertBuf := bytes.NewBufferString("update  ")
+	insertBuf := bytes.NewBufferString("update ")
 	insertBuf.WriteString(e.entityType)
 	insertBuf.WriteString(" set ")
 
-	count := 0
+	esc := mysqlservice.EscapeBytesBackslash1
+	var valstr string
+	count := 1
 	for n, p := range e.dirtySaveProps {
 		insertBuf.WriteString(n)
 		insertBuf.WriteString("=")
-		insertBuf.WriteString(utils.ConvertTypeToString(p.GetValue()))
-		if len(e.dirtySaveProps) < count {
+		if strings.Contains(p.def.TypeName, "protoMsg") {
+			val, err := proto.Marshal(p.GetValue().(proto.Message))
+			if err != nil {
+				log.Error("Marshal prop val failed typename:", p.def.TypeName)
+			}
+			val = esc(val)
+			insertBuf.WriteString("'")
+			valstr = string(val)
+			insertBuf.WriteString(valstr)
+			insertBuf.WriteString("'")
+
+		} else {
+
+			valstr = utils.ConvertTypeToString(p.GetValue())
+			insertBuf.WriteString(valstr)
+		}
+
+		if count < len(e.dirtySaveProps) {
 			insertBuf.WriteString(",")
 		}
 		count++
@@ -281,9 +301,9 @@ func (e *Entity) savePropsToMysqlDB() {
 
 	_, err = shardObj.MysqlObj.Exec(insertBuf.String())
 	if err != nil {
-		log.Error("Entity", e.GetEntityID(), "savePropsToMysqlDB insertBuf= ", insertBuf.String(), " , error:", err)
+		log.Error("Entity:", e.GetEntityID(), " ,savePropsToMysqlDB insertBuf= ", insertBuf.String(), " , error:", err)
 	} else {
-		log.Debug("Entity", e.GetEntityID(), "savePropsToMysqlDB insert sql: ", insertBuf.String(), " success")
+		log.Debug("Entity:", e.GetEntityID(), " ,savePropsToMysqlDB insert sql: ", insertBuf.String(), " success")
 	}
 
 	//清空数据

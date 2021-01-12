@@ -37,76 +37,85 @@ func (e *Entity) CreateEntityTable() {
 		sqlBuf.WriteString(" \n")
 
 		//add prop
-		for name, prop := range e.props {
-			//if prop.def.Persistence {
-			st := prop.def.TypeName
-			switch st {
-			case "bool", "int8":
-				sqlBuf.WriteString("	`")
-				sqlBuf.WriteString(name)
-				sqlBuf.WriteString("`")
-				sqlBuf.WriteString(" tinyint(0) NULL DEFAULT NULL,")
-				sqlBuf.WriteString(" \n")
-			case "int16":
-				sqlBuf.WriteString("	`")
-				sqlBuf.WriteString(name)
-				sqlBuf.WriteString("`")
-				sqlBuf.WriteString(" smallint(0) NULL DEFAULT NULL,")
-				sqlBuf.WriteString(" \n")
-			case "int32":
-				sqlBuf.WriteString("	`")
-				sqlBuf.WriteString(name)
-				sqlBuf.WriteString("`")
-				sqlBuf.WriteString(" int(0) NULL DEFAULT NULL,")
-				sqlBuf.WriteString(" \n")
-			case "int64":
-				sqlBuf.WriteString("	`")
-				sqlBuf.WriteString(name)
-				sqlBuf.WriteString("`")
-				sqlBuf.WriteString(" bigint(0) NULL DEFAULT NULL,")
-				sqlBuf.WriteString(" \n")
-			case "uint8":
-				sqlBuf.WriteString("	`")
-				sqlBuf.WriteString(name)
-				sqlBuf.WriteString("`")
-				sqlBuf.WriteString(" tinyint(0) UNSIGNED NULL DEFAULT NULL,")
-				sqlBuf.WriteString(" \n")
-			case "uint16":
-				sqlBuf.WriteString("	`")
-				sqlBuf.WriteString(name)
-				sqlBuf.WriteString("`")
-				sqlBuf.WriteString(" smallint(0) UNSIGNED NULL DEFAULT NULL,")
-				sqlBuf.WriteString(" \n")
-			case "uint32":
-				sqlBuf.WriteString("	`")
-				sqlBuf.WriteString(name)
-				sqlBuf.WriteString("`")
-				sqlBuf.WriteString(" int(0) UNSIGNED NULL DEFAULT NULL,")
-				sqlBuf.WriteString(" \n")
-			case "uint64":
-				sqlBuf.WriteString("	`")
-				sqlBuf.WriteString(name)
-				sqlBuf.WriteString("`")
-				sqlBuf.WriteString(" bigint(0) UNSIGNED NULL DEFAULT NULL,")
-				sqlBuf.WriteString(" \n")
-			case "string":
-				sqlBuf.WriteString("	`")
-				sqlBuf.WriteString(name)
-				sqlBuf.WriteString("`")
-				sqlBuf.WriteString(" varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,")
-				sqlBuf.WriteString(" \n")
-			case "float32":
-				sqlBuf.WriteString("	`")
-				sqlBuf.WriteString(name)
-				sqlBuf.WriteString("`")
-				sqlBuf.WriteString(" float NULL DEFAULT NULL,")
-				sqlBuf.WriteString(" \n")
-			case "float64":
-				sqlBuf.WriteString("	`")
-				sqlBuf.WriteString(name)
-				sqlBuf.WriteString("`")
-				sqlBuf.WriteString(" double NULL DEFAULT NULL,")
-				sqlBuf.WriteString(" \n")
+		if e.def != nil {
+			for name, prop := range e.def.Props {
+				//if prop.def.Persistence {
+				st := prop.TypeName
+				switch st {
+				case "bool", "int8":
+					sqlBuf.WriteString("	`")
+					sqlBuf.WriteString(name)
+					sqlBuf.WriteString("`")
+					sqlBuf.WriteString(" tinyint(0) NULL DEFAULT NULL,")
+					sqlBuf.WriteString(" \n")
+				case "int16":
+					sqlBuf.WriteString("	`")
+					sqlBuf.WriteString(name)
+					sqlBuf.WriteString("`")
+					sqlBuf.WriteString(" smallint(0) NULL DEFAULT NULL,")
+					sqlBuf.WriteString(" \n")
+				case "int32":
+					sqlBuf.WriteString("	`")
+					sqlBuf.WriteString(name)
+					sqlBuf.WriteString("`")
+					sqlBuf.WriteString(" int(0) NULL DEFAULT NULL,")
+					sqlBuf.WriteString(" \n")
+				case "int64":
+					sqlBuf.WriteString("	`")
+					sqlBuf.WriteString(name)
+					sqlBuf.WriteString("`")
+					sqlBuf.WriteString(" bigint(0) NULL DEFAULT NULL,")
+					sqlBuf.WriteString(" \n")
+				case "uint8":
+					sqlBuf.WriteString("	`")
+					sqlBuf.WriteString(name)
+					sqlBuf.WriteString("`")
+					sqlBuf.WriteString(" tinyint(0) UNSIGNED NULL DEFAULT NULL,")
+					sqlBuf.WriteString(" \n")
+				case "uint16":
+					sqlBuf.WriteString("	`")
+					sqlBuf.WriteString(name)
+					sqlBuf.WriteString("`")
+					sqlBuf.WriteString(" smallint(0) UNSIGNED NULL DEFAULT NULL,")
+					sqlBuf.WriteString(" \n")
+				case "uint32":
+					sqlBuf.WriteString("	`")
+					sqlBuf.WriteString(name)
+					sqlBuf.WriteString("`")
+					sqlBuf.WriteString(" int(0) UNSIGNED NULL DEFAULT NULL,")
+					sqlBuf.WriteString(" \n")
+				case "uint64":
+					sqlBuf.WriteString("	`")
+					sqlBuf.WriteString(name)
+					sqlBuf.WriteString("`")
+					sqlBuf.WriteString(" bigint(0) UNSIGNED NULL DEFAULT NULL,")
+					sqlBuf.WriteString(" \n")
+				case "string":
+					sqlBuf.WriteString("	`")
+					sqlBuf.WriteString(name)
+					sqlBuf.WriteString("`")
+					sqlBuf.WriteString(" varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,")
+					sqlBuf.WriteString(" \n")
+				case "float32":
+					sqlBuf.WriteString("	`")
+					sqlBuf.WriteString(name)
+					sqlBuf.WriteString("`")
+					sqlBuf.WriteString(" float NULL DEFAULT NULL,")
+					sqlBuf.WriteString(" \n")
+				case "float64":
+					sqlBuf.WriteString("	`")
+					sqlBuf.WriteString(name)
+					sqlBuf.WriteString("`")
+					sqlBuf.WriteString(" double NULL DEFAULT NULL,")
+					sqlBuf.WriteString(" \n")
+				default:
+					//protomsg
+					sqlBuf.WriteString("	`")
+					sqlBuf.WriteString(name)
+					sqlBuf.WriteString("`")
+					sqlBuf.WriteString("  blob NULL,")
+					sqlBuf.WriteString(" \n")
+				}
 			}
 			//}
 		}
@@ -283,7 +292,7 @@ func (e *Entity) SyncProps() {
 		return
 	}
 
-	log.Debug("Entity:", e.GetEntityID(), "SyncProps len: ", len(e.dirtyPropList))
+	log.Debug("Entity:", e.entityType, " ,EntityID: ", e.GetEntityID(), ", SyncProps dirty prop len: ", len(e.dirtyPropList))
 
 	for _, p := range e.dirtyPropList {
 		for _, s := range p.def.Sync {
