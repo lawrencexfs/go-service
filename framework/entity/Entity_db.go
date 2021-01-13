@@ -209,7 +209,7 @@ func (e *Entity) loadFromMysqlDB() {
 					} else {
 						len := val.Len()
 						for i := 0; i < len; i++ {
-							//log.Debug(utility.ConvertReflectVal(val.Index(i).Interface()))
+							//log.Debug("val index i: ", i, ", index val : ", utility.ConvertReflectVal(val.Index(i).Interface()))
 							valArray[i].val = val.Index(i).Interface()
 						}
 					}

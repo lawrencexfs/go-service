@@ -2,6 +2,7 @@ package entity
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/giant-tech/go-service/base/stream"
 
@@ -372,8 +373,12 @@ func (p *PropInfo) UnPackMysqlValue(data interface{}) {
 		}
 		p.value = string(ba)
 	default:
-
-		log.Warn("not knows type: ", p.def.TypeName)
+		//判断是不是protoMsg类型
+		if strings.Contains(p.def.TypeName, "protoMsg") {
+			p.value = data
+		} else {
+			log.Warn("not knows type: ", p.def.TypeName)
+		}
 
 	}
 }
