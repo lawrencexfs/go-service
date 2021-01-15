@@ -25,7 +25,7 @@ func NewTemplate(name string) *Template {
 	return t
 }
 
-// String 生成go文件代码字符串
+// genString 生成go文件代码字符串
 func (t *Template) genString() string {
 	str := t.genhead()
 
@@ -38,11 +38,12 @@ func (t *Template) genString() string {
 
 		//对struct做特殊处理
 		rv := GetTypeTemplate().IsExistTypeTemplate(t.typeInfo[key])
-
-		str += t.genSetFunc(key, t.typeInfo[key], rv)
+		isproto := strings.Contains(t.typeInfo[key], "protoMsg")
+		fmt.Printf("key=%s, type = %s , isproto is %t\n", key, t.typeInfo[key], isproto)
+		str += t.genSetFunc(key, t.typeInfo[key], rv, isproto)
 		str += t.genSetDirtyFunc(key)
 
-		str += t.genGetFunc(key, t.typeInfo[key], rv)
+		str += t.genGetFunc(key, t.typeInfo[key], rv, isproto)
 	}
 
 	//str = str[:len(str)-1]
@@ -56,8 +57,8 @@ func (t *Template) genString() string {
 // AddType 增加类型
 func (t *Template) AddType(typename, typ string) {
 	t.typeInfo[typename] = typ
-	// todo: 这个路径写死了，暂时用不到，后期修改
-	if strings.Contains(typ, "team12_server_service_mod/src/protoMsg") {
+
+	if strings.Contains(typ, "protoMsg") {
 		t.needAddProto = true
 	}
 }
@@ -71,10 +72,12 @@ func (t *Template) genhead() string {
 	baseStr += "	\"github.com/giant-tech/go-service/framework/iserver\"\n"
 	baseStr += "	\"github.com/globalsign/mgo/bson\"\n"
 
-	baseStr += ")\n"
 	if t.needAddProto {
-		baseStr += "import \"protoMsg\"\n"
+		baseStr += "	protoMsg \"entity-call-entity/src/pb\"\n"
+		baseStr += "	proto \"github.com/golang/protobuf/proto\"\n"
 	}
+	baseStr += ")\n"
+
 	baseStr += "\n"
 	baseStr += fmt.Sprintf("// %sDef 自动生成的属性包装代码\n", t.name)
 	baseStr += fmt.Sprintf("type %sDef struct {\n", t.name)
@@ -90,11 +93,11 @@ func (t *Template) genhead() string {
 	return baseStr
 }
 
-func (t *Template) genSetFunc(typename, typ string, isComPlexType bool) string {
+func (t *Template) genSetFunc(typename, typ string, isComPlexType bool, isProto bool) string {
 	var baseStr string
 	baseStr += fmt.Sprintf("// Set%s 设置 %s\n", typename, typename)
 
-	if isComPlexType {
+	if isComPlexType || isProto {
 		baseStr += fmt.Sprintf("func (p *%sDef) Set%s(v *%s) {\n", t.name, typename, typ)
 	} else {
 		baseStr += fmt.Sprintf("func (p *%sDef) Set%s(v %s) {\n", t.name, typename, typ)
@@ -119,11 +122,11 @@ func (t *Template) genSetDirtyFunc(typename string) string {
 	return baseStr
 }
 
-func (t *Template) genGetFunc(typename, typ string, isComPlexType bool) string {
+func (t *Template) genGetFunc(typename, typ string, isComPlexType bool, isProto bool) string {
 	var baseStr string
 	baseStr += fmt.Sprintf("// Get%s 获取 %s\n", typename, typename)
 
-	if isComPlexType {
+	if isComPlexType || isProto {
 		baseStr += fmt.Sprintf("func (p *%sDef) Get%s() *%s {\n", t.name, typename, typ)
 	} else {
 		baseStr += fmt.Sprintf("func (p *%sDef) Get%s() %s {\n", t.name, typename, typ)
@@ -153,6 +156,10 @@ func (t *Template) genGetFunc(typename, typ string, isComPlexType bool) string {
 		baseStr += fmt.Sprintf("	bson.Unmarshal(v.([]byte), &tempV)\n")
 		baseStr += fmt.Sprintf("	return &tempV\n")
 
+	} else if isProto {
+		baseStr += fmt.Sprintf("	var tempV %s\n", typ)
+		baseStr += fmt.Sprintf("	proto.Unmarshal(v.([]byte), &tempV)\n")
+		baseStr += fmt.Sprintf("	return &tempV\n")
 	} else {
 		baseStr += fmt.Sprintf("	return v.(%s)\n", typ)
 	}

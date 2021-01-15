@@ -43,7 +43,7 @@ func main() {
 	err := filepath.Walk(aliaspath, func(path string, file os.FileInfo, err error) error {
 
 		if strings.HasSuffix(path, ".json") {
-			fmt.Println("path: ", path)
+			fmt.Println("json path: ", path)
 
 			defInfo := gameconfig.New(path)
 			name := defInfo.Get("name")
@@ -64,7 +64,7 @@ func main() {
 				targetFileName = fmt.Sprintf("%s/alias.go", codeDir)
 			}
 
-			fmt.Println("targetFileName: ", targetFileName)
+			fmt.Println("gen target FileName: ", targetFileName)
 
 			f, err := os.Create(targetFileName)
 			if err != nil {
@@ -83,7 +83,7 @@ func main() {
 			f.Sync()
 			f.Close()
 
-			fmt.Println("Process Done")
+			fmt.Println("json file : ", file.Name(), " Process Done")
 		}
 
 		return nil
@@ -95,13 +95,12 @@ func main() {
 		}
 
 		if strings.HasSuffix(path, ".json") {
-			fmt.Println("path: ", path)
+			fmt.Println("json path: ", path)
 
 			defInfo := gameconfig.New(path)
 			name := defInfo.Get("name")
 
 			var t *Template
-
 			if file.Name() != "alias.json" {
 				t = NewTemplate(name.(string))
 				props := defInfo.Get("props").(map[string]interface{})
@@ -115,7 +114,7 @@ func main() {
 
 				targetFileName = fmt.Sprintf("%s/%sDef.go", codeDir, name)
 
-				fmt.Println("targetFileName: ", targetFileName)
+				fmt.Println("gen target FileName: ", targetFileName)
 
 				f, err := os.Create(targetFileName)
 				if err != nil {
@@ -130,7 +129,7 @@ func main() {
 				}
 				f.Sync()
 				f.Close()
-				fmt.Println("Process Done")
+				fmt.Println("json file : ", file.Name(), " Process Done")
 			}
 
 		}

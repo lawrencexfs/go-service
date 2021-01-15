@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 )
 
 // TypeTemplate 类型结构代码生成模版
@@ -61,6 +62,7 @@ func (t *TypeTemplate) genString() string {
 	for key, val := range t.typeInfo {
 
 		valMap := val.(map[string]interface{})
+		fmt.Println("valMap = ", valMap)
 		if valMap["type"] == "struct" {
 			str += t.genStruct(key, valMap)
 		} else if valMap["type"] == "map" {
@@ -127,18 +129,41 @@ func (t *TypeTemplate) genMap(name string, valMap map[string]interface{}) string
 
 	//valMap := val.(map[string]interface{})
 
+	val := valMap["fields"].(map[string]interface{})
+	fmt.Println("genMap val=", val)
+	keys := make([]string, 0)
 	// name为每个结构体的字段
-	for name, val := range valMap["fields"].(map[string]interface{}) {
+	for name, _ := range val {
+
+		keys = append(keys, name)
+	}
+
+	sort.Strings(keys)
+
+	count := 0
+	for _, k := range keys {
+		typMap := val[k].(map[string]interface{})
+		fmt.Println("genMap key=", k, ", val[k]=", val[k])
+		tval := typMap["type"].(string)
+
+		if 0 == count {
+			baseStr += fmt.Sprintf("%s]", tval)
+		} else if 1 == count {
+			baseStr += fmt.Sprintf("%s", tval)
+		}
+		count++
+	}
+	/*for name, val := range valMap["fields"].(map[string]interface{}) {
 
 		typMap := val.(map[string]interface{})
 		tval := typMap["type"].(string)
-
+		fmt.Println("genMap name= ", name, " ,val=", val)
 		if name == "index" {
-			baseStr += fmt.Sprintf("%s\n", tval)
-		} else if name == "value" {
 			baseStr += fmt.Sprintf("%s]", tval)
+		} else if name == "value" {
+			baseStr += fmt.Sprintf("%s", tval)
 		}
-	}
+	}*/
 
 	baseStr += "\n"
 	return baseStr
