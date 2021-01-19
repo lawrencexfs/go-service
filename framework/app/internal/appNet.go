@@ -205,12 +205,12 @@ func (appnet *AppNet) RefreshSrvInfo() {
 
 }
 
-// GetServiceListFromDB 从数据库刷新服务信息
+// GetServiceListFromDB 从redis数据库刷新服务信息
 func (appnet *AppNet) GetServiceListFromDB() []*idata.ServiceInfo {
 
 	serviceList, err := servermgr.Getservermgr().GetServiceList()
 	if err != nil {
-		log.Error("fetch service info failed", err)
+		log.Error("fetch service list failed", err)
 		return nil
 	}
 	return serviceList
@@ -241,17 +241,21 @@ func (appnet *AppNet) checkInConnectionList(srvID uint64) bool {
 }
 
 // isNeedConnectedToSrv 是否需要连接到服务器
+// param: 目标app info
 func (appnet *AppNet) isNeedConnectedToSrv(info *idata.AppInfo) bool {
 	return appnet.isClientSess(info) && !appnet.checkInConnectionList(info.AppID) &&
 		appnet.isConnectService(info)
 }
 
 // isClientSess 是否是客户端session
+// param: 目标app info
 func (appnet *AppNet) isClientSess(info *idata.AppInfo) bool {
 	return iserver.GetApp().GetAppID() < info.AppID /*&& srv.srvType != info.Type*/
 
 }
 
+// isConnectService 是否需要连接服务
+// param: 目标app info
 func (appnet *AppNet) isConnectService(info *idata.AppInfo) bool {
 	notMap := iserver.GetApp().GetNotConnectServices()
 	if len(notMap) == 0 {
@@ -272,10 +276,12 @@ func (appnet *AppNet) isConnectService(info *idata.AppInfo) bool {
 	return false
 }
 
-func (appnet *AppNet) isConnectType(ta idata.ServiceType, tb idata.ServiceType) bool {
+// isConnectType 是否是连接的service type
+// param: 目标app info
+func (appnet *AppNet) isConnectType(sa idata.ServiceType, sb idata.ServiceType) bool {
 	notMap := iserver.GetApp().GetNotConnectServices()
-	if notMap[ta] == tb || notMap[tb] == ta {
-		log.Debug("needn't connect, ta: ", ta, ", tb: ", tb)
+	if notMap[sa] == sb || notMap[sb] == sa {
+		log.Debug("needn't connect, between sa: ", sa, " and sb: ", sb)
 		return false
 	}
 
@@ -283,6 +289,7 @@ func (appnet *AppNet) isConnectType(ta idata.ServiceType, tb idata.ServiceType) 
 }
 
 // tryConnectToSrv 尝试连接到server
+// param: 目标app info
 func (appnet *AppNet) tryConnectToSrv(info *idata.AppInfo) {
 
 	if !appnet.isNeedConnectedToSrv(info) {
