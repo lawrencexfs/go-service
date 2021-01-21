@@ -59,6 +59,7 @@ func (sm *LocalServiceMgr) InitLocalService(sname string) error {
 
 	//把本地服务添加到代理服务管理中
 	proxy := CreateServiceProxy(s.GetServiceInfo(), true)
+
 	GetServiceProxyMgr().AddServiceProxy(proxy)
 
 	return nil
@@ -128,6 +129,39 @@ func (sm *LocalServiceMgr) GetAllLocalService(sid uint64) []*idata.ServiceInfo {
 	return slist
 }
 
+// GetAllLocalServiceForConnectNotify 获取所有本地服务,为service onconnect notify用的
+// 参数1: sid, 如果为0就是不排除自己
+// 参数2: notconnect, 不相互访问的service
+
+func (sm *LocalServiceMgr) GetAllLocalServiceForConnectNotify(sid uint64, sstype idata.ServiceType) []*idata.ServiceInfo {
+
+	notMap := iserver.GetApp().GetNotConnectServices()
+
+	var slist []*idata.ServiceInfo
+	//seelog.Debug("GetAllLocalService , sid: ", sid, " slist len=", len(sm.localServices), " localServices = ", sm.localServices)
+
+	if len(notMap) == 0 {
+		for _, s := range sm.localServices {
+			if s.GetSID() != sid {
+				slist = append(slist, s.GetServiceInfo())
+			}
+		}
+	} else {
+		for _, s := range sm.localServices {
+			if s.GetSID() != sid {
+				dstype1, ok1 := notMap[s.GetSType()]
+				dstype2, ok2 := notMap[sstype]
+
+				if (ok1 && (dstype1 != sstype)) && ok2 && (dstype2 != s.GetSType()) {
+					slist = append(slist, s.GetServiceInfo())
+				}
+			}
+		}
+	}
+	seelog.Info("GetAllLocalServiceForConnectNotify sid=", sid, ", not connected service: ", notMap, " ,service list", slist)
+	return slist
+}
+
 // 判定一个SID是否在本地服务
 /*func (sm *LocalServiceMgr) IsInLocalServiceList(sID uint64) bool {
 	for _, s := range sm.localServices {
@@ -156,7 +190,7 @@ func (sm *LocalServiceMgr) OnClosed(infovec []*idata.ServiceInfo) {
 	}
 }
 
-// OnConnected 连接回调
+// OnConnected 真正得远程连接回调，不是本地服务连接回调
 func (sm *LocalServiceMgr) OnConnected(infovec []*idata.ServiceInfo) {
 
 	data := serializer.SerializeNew(infovec)

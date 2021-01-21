@@ -280,6 +280,10 @@ func (appnet *AppNet) isConnectService(info *idata.AppInfo) bool {
 // param: 目标app info
 func (appnet *AppNet) isConnectType(sa idata.ServiceType, sb idata.ServiceType) bool {
 	notMap := iserver.GetApp().GetNotConnectServices()
+	log.Debug("sa = ", sa, ", sb=", sb, ", notMap[sa]=", notMap[sa], " ,notMap[sb]=", notMap[sb])
+	if sa == sb {
+		return false
+	}
 	if notMap[sa] == sb || notMap[sb] == sa {
 		log.Debug("needn't connect, between sa: ", sa, " and sb: ", sb)
 		return false
@@ -355,7 +359,7 @@ func (appnet *AppNet) getServiceList(srvID uint64) ([]*idata.ServiceInfo, []*ida
 
 // OnServerConnected 连上特定的server回调
 func (appnet *AppNet) OnServerConnected(srvID uint64) {
-	log.Info("Connected to Server succeed !!!  ", srvID)
+	log.Info("Connected to Server succeed !!!  srvID = ", srvID)
 
 	if _, ok := appnet.clientSesses.Load(srvID); ok {
 		log.Error("Session existed, server id:", srvID)

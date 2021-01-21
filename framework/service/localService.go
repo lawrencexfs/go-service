@@ -215,7 +215,9 @@ func (s *LocalService) Run(closeSig chan bool) {
 	seelog.Debug("run service , serviceName: ", s.GetSName(), ", serviceType: ", s.GetSType(), ", ServerID: ", s.GetSID(), " tickMS: ", s.GetTickMS())
 
 	//通知上层服务可用
-	localservices := GetLocalServiceMgr().GetAllLocalService(s.GetSID())
+	localservices := GetLocalServiceMgr().GetAllLocalServiceForConnectNotify(s.GetSID(), s.GetSType())
+
+	//如果配了notconnect service, 就无需回调OnConnected
 	if len(localservices) > 0 {
 		data := serializer.SerializeNew(localservices)
 		msg := &msgdef.CallMsg{
