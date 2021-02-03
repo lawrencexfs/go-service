@@ -204,6 +204,8 @@ func (sm *SProxyMgr) AsyncCallAll(stype idata.ServiceType, methodName string, ar
 // OnServiceClosed 远程服务不可用
 func (sm *SProxyMgr) OnServiceClosed(appID uint64) {
 
+	sm.mtx.Lock()
+	defer sm.mtx.Unlock()
 	//远程不可用的service 集合
 	var infovec []*idata.ServiceInfo
 
