@@ -17,6 +17,7 @@ import (
 	mongodbservice "github.com/giant-tech/go-service/base/mongodbservice"
 	mysqlservice "github.com/giant-tech/go-service/base/mysqlservice"
 	dbservice "github.com/giant-tech/go-service/base/redisservice"
+	"github.com/giant-tech/go-service/base/utility"
 
 	"github.com/giant-tech/go-service/base/zlog"
 	"github.com/giant-tech/go-service/framework/idata"
@@ -87,15 +88,14 @@ func getNotConnectServiceMap(str string) map[idata.ServiceType]idata.ServiceType
 			panic("NotConnectServiceMap incorrect")
 		}
 
-		type0 := service.GetServiceByName(kv[0])
-		type1 := service.GetServiceByName(kv[1])
+		//type0 := service.GetServiceByName(kv[0])
+		//type1 := service.GetServiceByName(kv[1])
 
-		if type0 == nil || type1 == nil {
-			panic("NotConnectServiceMap GetServiceByName not found")
-		}
+		type0 := utility.Atoi(kv[0])
+		type1 := utility.Atoi(kv[1])
 
-		tempMap[type0.ServiceTypeID] = type1.ServiceTypeID
-		tempMap[type1.ServiceTypeID] = type0.ServiceTypeID
+		tempMap[idata.ServiceType(type0)] = idata.ServiceType(type1)
+		tempMap[idata.ServiceType(type1)] = idata.ServiceType(type0)
 	}
 
 	return tempMap
