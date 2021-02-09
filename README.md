@@ -25,6 +25,7 @@ The messaging of Service and Entity is handed over to App for processing, and no
 - db 
 	* Mongodb mgo library support, able to access mongodb sharded cluster
 	* redis library support
+	* mysql library support
 - Distributed server that can be debugged with vscode single step, N changes to 1
   * Generally speaking, a distributed server needs to start many processes. Once there are more processes, single-step debugging becomes very difficult. As a result, server development basically depends on logging to find problems. Normally developing game logic also has to open a lot of processes. Not only is it slow to start, but it is also inconvenient to find the problem. It feels very bad to check the problem in a pile of logs. The go-service framework uses the service design, all logic Split into many services. Mount the service you need according to the server type at startup.
 - Distributed server with functions that can be split at will, 1 becomes N
