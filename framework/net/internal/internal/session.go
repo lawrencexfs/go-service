@@ -31,8 +31,9 @@ func NewSession(conn net.Conn, encryEnabled bool, isClient bool, isIdip bool) *S
 	sess := &Session{
 		id: sessionIDGen.Inc(),
 
-		conn:    conn,
-		sendBuf: safecontainer.NewSafeList(),
+		conn: conn,
+		//sendBuf: safecontainer.NewSafeList(),
+		sendBuf: safecontainer.NewSafeListM(),
 
 		hbTimerInterval: time.Duration(viper.GetInt("Config.HBTimer")) * time.Second,
 		hbEnabled:       viper.GetBool("Config.HeartBeat"),
@@ -62,9 +63,10 @@ func NewSession(conn net.Conn, encryEnabled bool, isClient bool, isIdip bool) *S
 
 // Session 代表一个网络连接
 type Session struct {
-	id      uint64                  //唯一id
-	conn    net.Conn                // 底层连接对象
-	sendBuf *safecontainer.SafeList // 缓存待发送的数据
+	id   uint64   //唯一id
+	conn net.Conn // 底层连接对象
+	//sendBuf *safecontainer.SafeList // 缓存待发送的数据
+	sendBuf *safecontainer.SafeListMutex // 缓存待发送的数据
 
 	ctx       context.Context
 	ctxCancel context.CancelFunc

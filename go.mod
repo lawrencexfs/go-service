@@ -18,6 +18,7 @@ require (
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/klauspost/cpuid v1.2.1 // indirect
 	github.com/klauspost/reedsolomon v1.9.2 // indirect
+	github.com/magiconair/properties v1.8.0
 	github.com/prometheus/common v0.4.0
 	github.com/rogpeppe/godef v1.1.2 // indirect
 	github.com/spf13/pflag v1.0.3

@@ -38,7 +38,7 @@ func Test_list(t *testing.T) {
 
 func Test_mulist(t *testing.T) {
 
-	sl := NewSafeList_M()
+	sl := NewSafeListM()
 	assert.Equal(t, sl.IsEmpty(), true, "must empty")
 	sl.Put(1)
 	assert.Equal(t, sl.IsEmpty(), false, "must not empty")
@@ -81,7 +81,7 @@ func BenchmarkList(b *testing.B) {
 
 //mutex list
 func BenchmarkMuList(b *testing.B) {
-	sl := NewSafeList_M()
+	sl := NewSafeListM()
 
 	b.ResetTimer()
 
