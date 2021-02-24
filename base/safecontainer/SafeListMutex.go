@@ -32,8 +32,9 @@ func NewSafeListM() *SafeListMutex {
 
 // Put 放入
 func (sl *SafeListMutex) Put(data interface{}) {
-	newNode := newNodeM(data)
 	sl.mu.Lock()
+	newNode := newNodeM(data)
+
 	if sl.tail != nil {
 		sl.tail.next = newNode
 		sl.tail = newNode
@@ -41,13 +42,12 @@ func (sl *SafeListMutex) Put(data interface{}) {
 		sl.tail = newNode
 		sl.head = newNode
 	}
-
 	sl.mu.Unlock()
-
 	select {
 	case sl.HasDataC <- true:
 	default:
 	}
+
 }
 
 // Pop 拿出
