@@ -284,6 +284,7 @@ func (sess *Session) recvLoop() {
 
 		// readAndHandleOneMsg 有限流
 		if err = sess.readAndHandleOneMsg(); err != nil {
+			log.Debug("Session readAndHandleOneMsg err: ", err)
 			break
 		}
 	} // for

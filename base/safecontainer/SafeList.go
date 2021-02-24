@@ -61,8 +61,13 @@ func (sl *SafeList) Put(data interface{}) {
 
 	atomic.CompareAndSwapPointer(&sl.tail, tail, newNode)
 
+	//此处不是线程安全的, sl.HasDataC <- true: 这句可能会多个同时调用, 造成阻塞
+	//2种方法解决： 1：select {default} 2: 加大HasDataC的缓冲
 	if len(sl.HasDataC) == 0 {
-		sl.HasDataC <- true // XXX 此处有可能多个同时调用造成阻塞，可加大缓冲
+		select {
+		case sl.HasDataC <- true:
+		default:
+		}
 	}
 }
 
